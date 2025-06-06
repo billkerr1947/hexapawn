@@ -1,11 +1,14 @@
 import pygame
 import sys  # to exit
+import settings
+#from pawn import Pawn
 
 pygame.init()   # initialise pygame modules
-screen = pygame.display.set_mode((300, 300))    #create screen surface
+screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
+#create screen surface
 pygame.display.set_caption('Hexapawn')
 clock = pygame.time.Clock() # create a clock
-bg_colour = (230,230,230)   #bg colour value
+#self.pawn1 = Pawn()
 
 while True:    
     for event in pygame.event.get():
@@ -14,7 +17,8 @@ while True:
             # pygame.quit()
             sys.exit()
     
-    screen.fill(bg_colour)  
+    screen.fill(settings.bg_colour)  
+    #pawn1.blitme()
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(60)
     
