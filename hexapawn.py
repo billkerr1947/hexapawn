@@ -10,28 +10,28 @@ pygame.display.set_caption('Hexapawn')
 clock = pygame.time.Clock() # create a clock
 
 class Pawn:
-    """we want six pawns"""
+    """make a class since want six pawns"""
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.pos = (self.x, self.y)   # pawn position
         self.screen = screen    # pawn access to hexapawn screen
-        self.pawn_image_white = pygame.image.load('images/white_pawn.jpg')
-        self.pawn_image_black = pygame.image.load('images/black_pawn.jpg')
+        self.pawn_image_white = pygame.image.load('images/white_pawn.png')
+        self.pawn_image_black = pygame.image.load('images/black_pawn.png')
         self.pawn_rect_white = self.pawn_image_white.get_rect()   # the image needs a rect
         self.pawn_rect_black = self.pawn_image_black.get_rect()   # the image needs a rect
-pawn1 =  Pawn(0,0)
-pawn1.pos = (25,300)
-pawn2 = Pawn (0, 50)
-pawn2.pos = (175, 300)
-pawn3 = Pawn (100,200)
-pawn3.pos = (325, 300)
+pawn1 =  Pawn(25,300)
+#pawn1.pos = (25,300)
+pawn2 = Pawn (175, 300)
+#pawn2.pos = (175, 300)
+pawn3 = Pawn (325,300)
+#pawn3.pos = (325, 300)
 pawn4 = Pawn (25,10)
-pawn4.pos = (25,10)
-pawn5 = Pawn (25,10)
-pawn5.pos =(175,10)
-pawn6 = Pawn (25,10)
-pawn6.pos =(325,10)
+#pawn4.pos = (25,10)
+pawn5 = Pawn (175,10)
+#pawn5.pos =(175,10)
+pawn6 = Pawn (325,10)
+#pawn6.pos =(325,10)
 
 
  
