@@ -2,7 +2,6 @@ import pygame
 import sys  # to exit
 import settings
 
-
 pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
 #create screen surface
@@ -16,24 +15,27 @@ class Pawn:
         self.y = y
         self.pos = (self.x, self.y)   # pawn position
         self.screen = screen    # pawn access to hexapawn screen
-        self.pawn_image_white = pygame.image.load('images/white_pawn.png')
-        self.pawn_image_black = pygame.image.load('images/black_pawn.png')
+        self.pawn_image_white = pygame.image.load('images/whitePawn.png')
+        self.pawn_image_black = pygame.image.load('images/blackPawn.png')
         self.pawn_rect_white = self.pawn_image_white.get_rect()   # the image needs a rect
         self.pawn_rect_black = self.pawn_image_black.get_rect()   # the image needs a rect
-pawn1 =  Pawn(25,300)
-#pawn1.pos = (25,300)
-pawn2 = Pawn (175, 300)
-#pawn2.pos = (175, 300)
-pawn3 = Pawn (325,300)
-#pawn3.pos = (325, 300)
-pawn4 = Pawn (25,10)
-#pawn4.pos = (25,10)
-pawn5 = Pawn (175,10)
-#pawn5.pos =(175,10)
-pawn6 = Pawn (325,10)
-#pawn6.pos =(325,10)
 
+# make a dictionary pawn_init_pos
+boardDict = {1 : (25,300),2 : (175, 300), 3 : (325,300),4 : (25, 10), 5 : (175,10),6 : (325, 10),}
+#for loop here?
+pos1 = boardDict[1]
+pos2 = boardDict[2]
+pos3 = boardDict[3]
+pos4 = boardDict[4]
+pos5 = boardDict[5]
+pos6 = boardDict[6]
 
+pawn1 =  Pawn (*pos1) #unpacking tuple, boardDict[1] fails, why?
+pawn2 = Pawn (*pos2)
+pawn3 = Pawn (*pos3)
+pawn4 = Pawn (*pos4)
+pawn5 = Pawn (*pos5)
+pawn6 = Pawn (*pos6)
  
 while True:    
     for event in pygame.event.get():
