@@ -1,19 +1,13 @@
 import pygame
 import sys  # to exit
 import settings
+from settings import boardDict
 
 pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
 #create screen surface
 pygame.display.set_caption('Hexapawn')
 clock = pygame.time.Clock() # create a clock
-
-# make a dictionary sqNum : pos(x, y)
-# all required pawn positions are in this dictionary
-boardDict = {1 : (30,320),2 : (180, 320), 3 : (330,320),
-             4 : (30, 170), 5 : (180,170),6 : (330, 170),
-             7 : (30, 20), 8 : (180,20),9 : (330, 20)
-             }
 
 class Pawn:
     """make a class since want six pawns, 3 white, 3 black"""
@@ -36,6 +30,23 @@ BP1 = Pawn()
 BP2 = Pawn()
 BP3 = Pawn()
 
+def position (pieceList ):
+    for num, piece in enumerate(pieceList):
+        if piece == WP1:
+            screen.blit(WP1.WP,(WP1.pos(boardDict, num+1)))   #(image surface WP, positon)
+        # blit stands for block image transfer!
+        # enumerate to run two variables in for loop!
+        if piece == WP2:
+            screen.blit(WP2.WP,(WP2.pos(boardDict, num+1)))
+        if piece == WP3:
+            screen.blit(WP3.WP,(WP3.pos(boardDict, num+1)))
+        if piece == BP1:
+            screen.blit(BP1.BP,(BP1.pos(boardDict, num+1)))
+        if piece == BP2:
+            screen.blit(BP2.BP,(BP2.pos(boardDict, num+1)))
+        if piece == BP3:
+            screen.blit(BP3.BP,(BP3.pos(boardDict, num+1)))
+            
 while True:    
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
@@ -43,6 +54,11 @@ while True:
             # pygame.quit()
             sys.exit()
     
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                print('key press')  #works
+                #restart (WP_startList, BP_startList )   #running but can't see it?
+        
     screen.fill(settings.bg_colour)  
     # draw line grid on screen (must be in while loop)
     pygame.draw.line(screen,"red",start_pos=(150,0),end_pos=(150,450))
@@ -50,15 +66,9 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(0,150),end_pos=(450,150))
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
     
-    WP_startList = [WP1, WP2, WP3]
-    BP_startList = [BP1, BP2, BP3]
-    for num, P in enumerate(WP_startList):
-        screen.blit(P.WP,(P.pos(boardDict, num+1)))   #(image surface WP, positon)
-        # blit stands for block image transfer!
-        # enumerate to run two variables in for loop!
-    for num, P in enumerate(BP_startList):
-        screen.blit(P.BP,(P.pos(boardDict, num+7)))
-             
+    pieceList =[WP1, WP2, None, None, None, WP3, BP1, BP2, BP3 ]
+    position(pieceList)
+    
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(60)
     
