@@ -8,37 +8,34 @@ screen = pygame.display.set_mode((settings.screen_width, settings.screen_height)
 pygame.display.set_caption('Hexapawn')
 clock = pygame.time.Clock() # create a clock
 
+# make a dictionary sqNum : pos(x, y)
+# all required pawn positions are in this dictionary
+boardDict = {1 : (30,320),2 : (180, 320), 3 : (330,320),
+             4 : (30, 170), 5 : (180,170),6 : (330, 170),
+             7 : (30, 20), 8 : (180,20),9 : (330, 20)
+             }
+
 class Pawn:
     """make a class since want six pawns, 3 white, 3 black"""
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.pos = (self.x, self.y)   # pawn position
+    def __init__(self):
         self.screen = screen    # pawn access to hexapawn screen
-        self.pawn_image_white = pygame.image.load('images/whitePawn.png')
-        self.pawn_image_black = pygame.image.load('images/blackPawn.png')
-        # put selected white image here too!
-        self.pawn_image_white_selected = pygame.image.load('images/whitePawnSelected.png')
-        self.pawn_rect_white = self.pawn_image_white.get_rect()   # the image needs a rect
-        self.pawn_rect_black = self.pawn_image_black.get_rect()   # the image needs a rect
+        self.WP = pygame.image.load('images/whitePawn.png') #image surface!
+        self.BP = pygame.image.load('images/blackPawn.png')
+        self.WPSelected = pygame.image.load('images/whitePawnSelected.png')
 
-# make a dictionary pawn_init_pos
-boardDict = {1 : (25,320),2 : (175, 320), 3 : (325,320),4 : (25, 20), 5 : (175,20),6 : (325, 20),}
-#for loop here?
-pos1 = boardDict[1] #tuple (25,320)
-pos2 = boardDict[2]
-pos3 = boardDict[3]
-pos4 = boardDict[4]
-pos5 = boardDict[5]
-pos6 = boardDict[6]
-# create pawn instances
-pawn1 =  Pawn (*pos1) #unpacking tuple, boardDict[1] fails, why?
-pawn2 = Pawn (*pos2)
-pawn3 = Pawn (*pos3)
-pawn4 = Pawn (*pos4)
-pawn5 = Pawn (*pos5)
-pawn6 = Pawn (*pos6)
- 
+#    pawn method -> input square ID, return position
+    def pos(self, boardDict, num ):
+        return boardDict[num]
+
+#create WP instances   
+WP1 = Pawn()
+WP2 = Pawn()
+WP3 = Pawn()
+#create BP instances
+BP1 = Pawn()
+BP2 = Pawn()
+BP3 = Pawn()
+
 while True:    
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
@@ -52,15 +49,16 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(300,0),end_pos=(300,450))
     pygame.draw.line(screen,"red",start_pos=(0,150),end_pos=(450,150))
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
-   
-    # display images using lists and for loops
-    pawn_list_W = [pawn1, pawn2, pawn3]
-    pawn_list_B = [pawn4, pawn5, pawn6]
-    for pawn in pawn_list_W:    
-        screen.blit(pawn.pawn_image_white,(pawn.pos))
-    for pawn in pawn_list_B:    
-        screen.blit(pawn.pawn_image_black,(pawn.pos))
     
+    WP_startList = [WP1, WP2, WP3]
+    BP_startList = [BP1, BP2, BP3]
+    for num, P in enumerate(WP_startList):
+        screen.blit(P.WP,(P.pos(boardDict, num+1)))   #(image surface WP, positon)
+        # blit stands for block image transfer!
+        # enumerate to run two variables in for loop!
+    for num, P in enumerate(BP_startList):
+        screen.blit(P.BP,(P.pos(boardDict, num+7)))
+             
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(60)
     
