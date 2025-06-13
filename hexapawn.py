@@ -13,8 +13,11 @@ class Pawn:
     """make a class since want six pawns, 3 white, 3 black"""
     def __init__(self):
         self.screen = screen    # pawn access to hexapawn screen
-        self.WP = pygame.image.load('images/whitePawn.png') #image surface!
-        self.BP = pygame.image.load('images/blackPawn.png')
+        self.screenRect = self.screen.get_rect()
+        self.WPimg = pygame.image.load('images/whitePawn.png') #image surface!
+        self.WPimgRect = self.WPimg.get_rect() # for mouse event detection
+        self.BPimg = pygame.image.load('images/blackPawn.png')
+        self.BPimgRect = self.BPimg.get_rect() 
         self.WPSelected = pygame.image.load('images/whitePawnSelected.png')
 
 #    pawn method -> input square ID, return position
@@ -30,22 +33,29 @@ BP1 = Pawn()
 BP2 = Pawn()
 BP3 = Pawn()
 
+print(WP1.WPimgRect.bottomleft)
+print(WP1.screenRect.bottomleft)
+print(WP1.screenRect.center)
+#WP1.WPimgRect.bottomleft = screenRect.bottomleft
 def position (pieceList ):
     for num, piece in enumerate(pieceList):
         if piece == WP1:
-            screen.blit(WP1.WP,(WP1.pos(boardDict, num+1)))   #(image surface WP, positon)
-        # blit stands for block image transfer!
+            WP1.WPimgRect.topleft = WP1.pos(boardDict, num+1) #(30, 320) WP1.screenRect.bottomleft
+            screen.blit(WP1.WPimg,(WP1.WPimgRect)) #  #(image surface WP, positon)
+                  # blit stands for block image transfer!
         # enumerate to run two variables in for loop!
         if piece == WP2:
-            screen.blit(WP2.WP,(WP2.pos(boardDict, num+1)))
+            WP2.WPimgRect.topleft = WP2.pos(boardDict, num+1)
+            screen.blit(WP2.WPimg,(WP2.WPimgRect))
         if piece == WP3:
-            screen.blit(WP3.WP,(WP3.pos(boardDict, num+1)))
+            WP3.WPimgRect.topleft = WP3.pos(boardDict, num+1)
+            screen.blit(WP3.WPimg,(WP3.WPimgRect))
         if piece == BP1:
-            screen.blit(BP1.BP,(BP1.pos(boardDict, num+1)))
+            screen.blit(BP1.BPimg,(BP1.pos(boardDict, num+1)))
         if piece == BP2:
-            screen.blit(BP2.BP,(BP2.pos(boardDict, num+1)))
+            screen.blit(BP2.BPimg,(BP2.pos(boardDict, num+1)))
         if piece == BP3:
-            screen.blit(BP3.BP,(BP3.pos(boardDict, num+1)))
+            screen.blit(BP3.BPimg,(BP3.pos(boardDict, num+1)))
             
 while True:    
     for event in pygame.event.get():
@@ -53,6 +63,12 @@ while True:
         if event.type == pygame.QUIT:
             # pygame.quit()
             sys.exit()
+            
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if WP1.WPimgRect.collidepoint(pygame.mouse.get_pos()):
+                print ('Y')
+            print ("mouse down")
+            print(pygame.mouse.get_pos())
     
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
@@ -68,7 +84,10 @@ while True:
     
     pieceList =[WP1, WP2, None, None, None, WP3, BP1, BP2, BP3 ]
     position(pieceList)
+    #print(WP1.WPimgRect)
     
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(60)
+    
+
     
