@@ -12,24 +12,17 @@ clock = pygame.time.Clock() # create a clock
 class Pawn:
     """make a class since want six pawns, 3 white, 3 black"""
     def __init__(self):
-        self.screen = screen    # give pawns access to hexapawn screen
+        self.screen = screen    # pawn access to hexapawn screen
         self.screenRect = self.screen.get_rect()
         self.WPimg = pygame.image.load('images/whitePawn.png') #image surface!
-        self.WPimgRect = self.WPimg.get_rect() # rect for mouse event detection
+        self.WPimgRect = self.WPimg.get_rect() # for mouse event detection
         self.BPimg = pygame.image.load('images/blackPawn.png')
         self.BPimgRect = self.BPimg.get_rect() 
         self.WPSelected = pygame.image.load('images/whitePawnSelected.png')
 
-#    pawn pos method -> input boardDict, num -> return board position (x, y)
+#    pawn method -> input square ID, return position
     def pos(self, boardDict, num ):
         return boardDict[num]
-
-class RedDot:
-    """ Need 2 red dots sometimes"""
-    def __init__(self):
-        self.screen = screen
-        self.redDotImg = pygame.image.load('images/redDot.png')
-        self.redDotRect = self.redDotImg.get_rect()
 
 #create WP instances   
 WP1 = Pawn()
@@ -39,25 +32,18 @@ WP3 = Pawn()
 BP1 = Pawn()
 BP2 = Pawn()
 BP3 = Pawn()
-# create red dot instances
-RD1 = RedDot()
-RD2 = RedDot()
-boole = False
-flag = 1
 
-# position rect/images in pieceList positions
+print(WP1.WPimgRect.bottomleft)
+print(WP1.screenRect.bottomleft)
+print(WP1.screenRect.center)
+#WP1.WPimgRect.bottomleft = screenRect.bottomleft
 def position (pieceList ):
     for num, piece in enumerate(pieceList):
-        # enumerate to run two variables in for loop!
         if piece == WP1:
-            WP1.WPimgRect.topleft = WP1.pos(boardDict, num+1) 
-            #(30, 320) position pawn rect by boardDict values
+            WP1.WPimgRect.topleft = WP1.pos(boardDict, num+1) #(30, 320) WP1.screenRect.bottomleft
             screen.blit(WP1.WPimg,(WP1.WPimgRect)) #  #(image surface WP, positon)
                   # blit stands for block image transfer!
-            if boole:
-                screen.blit(WP1.WPSelected,(WP1.WPimgRect))
-                RD1.redDotRect.topleft = (WP1.pos(boardDict, num + 4)) #(30, 170)
-                screen.blit(RD1.redDotImg,(RD1.redDotRect))
+        # enumerate to run two variables in for loop!
         if piece == WP2:
             WP2.WPimgRect.topleft = WP2.pos(boardDict, num+1)
             screen.blit(WP2.WPimg,(WP2.WPimgRect))
@@ -80,16 +66,8 @@ while True:
             
         if event.type == pygame.MOUSEBUTTONDOWN:
             if WP1.WPimgRect.collidepoint(pygame.mouse.get_pos()):
-                # True if mouse clicks inside WPimgRect
-                boole = True 
-            if RD1.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                begin = 0
-                end = 3
-                flag = 2
-                
-            
-        
-        
+                print ('Y')
+            print ("mouse down")
             print(pygame.mouse.get_pos())
     
         elif event.type == pygame.KEYDOWN:
@@ -104,18 +82,10 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(0,150),end_pos=(450,150))
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
     
-    if flag == 1:
-        #pieceList = pieceList_mod
-        pieceList =[WP1, WP2, WP3,None, None, None,  BP1, BP2, BP3 ]
-    if flag == 2:
-        #move WP1 to pos4; move None to pos1
-        pieceList[begin] = None
-        pieceList[end] = WP1
-        #pieceList =[WP1, WP2, WP3,None, None, None,  BP1, BP2, BP3 ]
-        #print (pieceList)
-        
+    pieceList =[WP1, WP2, None, None, None, WP3, BP1, BP2, BP3 ]
     position(pieceList)
-        
+    #print(WP1.WPimgRect)
+    
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(60)
     
