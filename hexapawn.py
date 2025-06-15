@@ -2,6 +2,7 @@ import pygame
 import sys  # to exit
 import settings
 from settings import boardDict
+import random
 
 pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
@@ -111,18 +112,27 @@ while True:
         # start position
         pieceList =[WP1, WP2, WP3, None, NotImplementedError, None,  BP1, BP2, BP3 ]
     if flag == 2:
-        #move WP1 to pos4; move None to pos1
+        #move WP1 from begin pos to end pos
         pieceList[begin] = None
         pieceList[end] = WP1
-        # how to get correct begin & end for each move
         #pieceList is now changed
-        #print (pieceList), shows None in piecelist[0]
-        
+        #move BP2 from begin pos to end pos
+        # how to choose one from all possibles? random from list
+        Bfrom = [7,8]   # possible BP start squares, BP2 & 3
+        choice = random.choice(Bfrom)   #choose one of the squares
+        Bto = [4,5]     # possible BP end squares
+        n = Bfrom.index(choice) # index number of choice
+        pieceList[choice] = None    #remove BP from choice sq
+        to = Bto[n] # number of desired end sq for BP
+        pieceList[to] = BP2 # move BP to end sq
+        flag = 3    # jump out 
+        # reset clock to 1!?!?
+                
     position(pieceList)
     #print(pieceList.index(WP1))
         
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
-    clock.tick(60)
+    clock.tick(1)
     
 
     
