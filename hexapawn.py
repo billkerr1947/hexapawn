@@ -14,7 +14,7 @@ class Pawn:
     """make a class since want six pawns, 3 white, 3 black"""
     def __init__(self):
         self.screen = screen    # give pawns access to hexapawn screen
-        self.screenRect = self.screen.get_rect()
+        self.screenRect = self.screen.get_rect() # for positioning pawns later
         self.WPimg = pygame.image.load('images/whitePawn.png') #image surface!
         self.WPimgRect = self.WPimg.get_rect() # rect for mouse event detection
         self.BPimg = pygame.image.load('images/blackPawn.png')
@@ -32,50 +32,69 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.redDotRect = self.redDotImg.get_rect()
 
-#create WP instances   
-WP1 = Pawn()
-WP2 = Pawn()
-WP3 = Pawn()
+#create WP instances 
+# do I need to number them, boardDict key is an ID?  
+WP = Pawn()
+#WP = Pawn()
+#WP = Pawn()
 #create BP instances
-BP1 = Pawn()
-BP2 = Pawn()
-BP3 = Pawn()
+BP = Pawn()
+BP = Pawn()
+BP = Pawn()
 # create red dot instances
 RD1 = RedDot()
 RD2 = RedDot()
 boole = False
 flag = 1
 
-# position rect/images in pieceList positions
+# position and show rect/images in pieceList positions
 def position (pieceList ):
     for num, piece in enumerate(pieceList):
         # enumerate indexes the for loop!
-        if piece == WP1:
-            WP1.WPimgRect.topleft = WP1.pos(boardDict, num) 
+        if piece == WP:
+            WP.WPimgRect.topleft = WP.pos(boardDict, num) 
             #(30, 320) position pawn rect by boardDict values
-            screen.blit(WP1.WPimg,(WP1.WPimgRect))  #(image surface WP, positon)
+            screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
                   # blit stands for block image transfer!
             if boole: #boole set to True when WP clicked
-                screen.blit(WP1.WPSelected,(WP1.WPimgRect)) # selected WP image
-                RD1.redDotRect.topleft = (WP1.pos(boardDict, num + 3)) 
-                RD2.redDotRect.topleft = (WP1.pos(boardDict, num + 4))
+                screen.blit(WP.WPSelected,(WP.WPimgRect)) # selected WP image
+                RD1.redDotRect.topleft = (WP.pos(boardDict, num + 3)) 
+                RD2.redDotRect.topleft = (WP.pos(boardDict, num + 4))
                 # redDot rect plus 3 from WP
                 screen.blit(RD1.redDotImg,(RD1.redDotRect)) # show redDot img
                 screen.blit(RD2.redDotImg,(RD2.redDotRect))
-                
-        if piece == WP2:
-            WP2.WPimgRect.topleft = WP2.pos(boardDict, num)
-            screen.blit(WP2.WPimg,(WP2.WPimgRect))
-        if piece == WP3:
-            WP3.WPimgRect.topleft = WP3.pos(boardDict, num)
-            screen.blit(WP3.WPimg,(WP3.WPimgRect))
-        if piece == BP1:
-            screen.blit(BP1.BPimg,(BP1.pos(boardDict, num)))
-        if piece == BP2:
-            screen.blit(BP2.BPimg,(BP2.pos(boardDict, num)))
-        if piece == BP3:
-            screen.blit(BP3.BPimg,(BP3.pos(boardDict, num)))
+        
+        if piece == BP:
+            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
+        if piece == BP:
+            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
+        if piece == BP:
+            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
+
+#setup up from and to lists for WP
+fromList =[]
+toList = []
+pieceList =[None ,None, None, None ,None, WP,None, BP,BP ]
+def to_from (pieceList):
+    for num in range(6):
+        if pieceList[num] == WP:
+            if pieceList[num+3] == None:
+                fromList.append(pieceList.index(WP))
+                toList.append(pieceList.index(WP)+3)
+            if pieceList.index(WP) % 3 > 0:
+                if pieceList[num+2] == BP:
+                    fromList.append(pieceList.index(WP))
+                    toList.append(pieceList.index(BP))
+            if pieceList.index(WP) % 3 < 2:
+                if pieceList[num+4] == BP:
+                    fromList.append(pieceList.index(WP))
+                    toList.append(pieceList.index(BP))
             
+    print (fromList)        
+    print (toList)
+
+to_from(pieceList)
+
 while True:    
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
@@ -84,8 +103,8 @@ while True:
             sys.exit()
             
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if WP1.WPimgRect.collidepoint(pygame.mouse.get_pos()):
-                begin = pieceList.index(WP1)    # board pos of this WP
+            if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
+                begin = pieceList.index(WP)    # board pos of this WP
                 # True if mouse clicks inside WPimgRect
                 boole = True #turn on redDot
             if RD1.redDotRect.collidepoint(pygame.mouse.get_pos()):
@@ -110,21 +129,22 @@ while True:
     if flag == 1:
         # flag = 1 in preamble
         # start position
-        pieceList =[WP1, WP2, WP3, None, NotImplementedError, None,  BP1, BP2, BP3 ]
+        pieceList =[None, WP ,None , None, None, None,  BP, BP, BP ]
     if flag == 2:
         #move WP1 from begin pos to end pos
         pieceList[begin] = None
-        pieceList[end] = WP1
+        pieceList[end] = WP
         #pieceList is now changed
-        #move BP2 from begin pos to end pos
+        #move black pawn BP from begin pos to end pos
         # how to choose one from all possibles? random from list
-        Bfrom = [7,8]   # possible BP start squares, BP2 & 3
+        Bfrom = [7,8]   # possible BP start squares, BP & 3
         choice = random.choice(Bfrom)   #choose one of the squares
         Bto = [4,5]     # possible BP end squares
         n = Bfrom.index(choice) # index number of choice
         pieceList[choice] = None    #remove BP from choice sq
         to = Bto[n] # number of desired end sq for BP
-        pieceList[to] = BP2 # move BP to end sq
+        pieceList[to] = BP # move BP to end sq
+        boole = True # redDot back on
         flag = 3    # jump out 
         # reset clock to 1!?!?
                 
