@@ -3,6 +3,7 @@ import sys  # to exit
 import settings
 from settings import boardDict
 import random
+import ctypes
 
 pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
@@ -33,17 +34,22 @@ class RedDot:
         self.redDotRect = self.redDotImg.get_rect()
 
 #create WP instances 
-# do I need to number them, boardDict key is an ID?  
-
 WPList = []
 for num in range(3):
     WP = Pawn() 
     WPList.append(WP)
+    #print(WP is WPList[0])  #TFF!!!
+    print(WP is WPList[num])  #TTT!!!
+  
 
-print(WPList)
-print (WPList[0])
-print (WPList[1].pos(boardDict, 1))
-#WP = Pawn()
+WP=Pawn()
+
+
+#print(WPList)
+print(WPList[0])
+#print (ctypes.cast(WPList[0],ctypes.py_object).value)
+#print (WPList[1].pos(boardDict, 1))
+WP = Pawn()
 #create BP instances
 BP = Pawn()
 BP = Pawn()
@@ -56,7 +62,7 @@ flag = 1
 
 # position and show rect/images in pieceList positions
 #create position each WP pawn individually
-pieceList =[None ,None, None,None, None,None ]
+pieceList =[WP ,None, None,None, None,None ]
 
 # pieces_show code will show the pieces when run in the while loop!
 # WPList[num] works even though address returned and not WP 
@@ -70,6 +76,8 @@ def pieces_show(pieceList):
         screen.blit(BP.BPimg,(BP.pos(boardDict, num+6)))
         #print(pieceList)
 
+
+
 #setup up from and to lists for WP
 fromList =[]
 toList = []
@@ -82,11 +90,11 @@ def to_from (pieceList):
             if pieceList[num+3] == None:
                 fromList.append(pieceList.index(WP))
                 toList.append(pieceList.index(WP)+3)
-            if pieceList.index(WP) % 3 > 0:
+            if pieceList.index(WP) % 3 > 0: # needs comment
                 if pieceList[num+2] == BP:
                     fromList.append(pieceList.index(WP))
                     toList.append(pieceList.index(BP))
-            if pieceList.index(WP) % 3 < 2:
+            if pieceList.index(WP) % 3 < 2: # needs comment
                 if pieceList[num+4] == BP:
                     fromList.append(pieceList.index(WP))
                     toList.append(pieceList.index(BP))
@@ -128,7 +136,7 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
     
     pieces_show(pieceList)
-    print(pieceList)
+    #print(pieceList)
        
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(1)
