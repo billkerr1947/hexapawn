@@ -34,8 +34,15 @@ class RedDot:
 
 #create WP instances 
 # do I need to number them, boardDict key is an ID?  
-WP = Pawn()
-#WP = Pawn()
+
+WPList = []
+for num in range(3):
+    WP = Pawn() 
+    WPList.append(WP)
+
+print(WPList)
+print (WPList[0])
+print (WPList[1].pos(boardDict, 1))
 #WP = Pawn()
 #create BP instances
 BP = Pawn()
@@ -48,33 +55,27 @@ boole = False
 flag = 1
 
 # position and show rect/images in pieceList positions
-def position (pieceList ):
-    for num, piece in enumerate(pieceList):
-        # enumerate indexes the for loop!
-        if piece == WP:
-            WP.WPimgRect.topleft = WP.pos(boardDict, num) 
-            #(30, 320) position pawn rect by boardDict values
-            screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
-                  # blit stands for block image transfer!
-            if boole: #boole set to True when WP clicked
-                screen.blit(WP.WPSelected,(WP.WPimgRect)) # selected WP image
-                RD1.redDotRect.topleft = (WP.pos(boardDict, num + 3)) 
-                RD2.redDotRect.topleft = (WP.pos(boardDict, num + 4))
-                # redDot rect plus 3 from WP
-                screen.blit(RD1.redDotImg,(RD1.redDotRect)) # show redDot img
-                screen.blit(RD2.redDotImg,(RD2.redDotRect))
-        
-        if piece == BP:
-            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
-        if piece == BP:
-            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
-        if piece == BP:
-            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
+#create position each WP pawn individually
+pieceList =[None ,None, None,None, None,None ]
+
+# pieces_show code will show the pieces when run in the while loop!
+# WPList[num] works even though address returned and not WP 
+def pieces_show(pieceList):
+    for num in range(3):        
+        WPList[num].WPimgRect.topleft = WPList[num].pos(boardDict, num) 
+        #position pawn rect by boardDict values
+        screen.blit(WPList[num].WPimg,(WPList[num].WPimgRect))  #(image surface WP, positon)
+        pieceList.insert(num,WPList[num])
+        # black pawns
+        screen.blit(BP.BPimg,(BP.pos(boardDict, num+6)))
+        #print(pieceList)
 
 #setup up from and to lists for WP
 fromList =[]
 toList = []
-pieceList =[None ,None, None, None ,None, WP,None, BP,BP ]
+
+# not recognising WP, fromList and toList not formed
+# geeks ctypes reference?
 def to_from (pieceList):
     for num in range(6):
         if pieceList[num] == WP:
@@ -93,7 +94,7 @@ def to_from (pieceList):
     print (fromList)        
     print (toList)
 
-to_from(pieceList)
+print(to_from(pieceList))
 
 while True:    
     for event in pygame.event.get():
@@ -126,31 +127,9 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(0,150),end_pos=(450,150))
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
     
-    if flag == 1:
-        # flag = 1 in preamble
-        # start position
-        pieceList =[None, WP ,None , None, None, None,  BP, BP, BP ]
-    if flag == 2:
-        #move WP1 from begin pos to end pos
-        pieceList[begin] = None
-        pieceList[end] = WP
-        #pieceList is now changed
-        #move black pawn BP from begin pos to end pos
-        # how to choose one from all possibles? random from list
-        Bfrom = [7,8]   # possible BP start squares, BP & 3
-        choice = random.choice(Bfrom)   #choose one of the squares
-        Bto = [4,5]     # possible BP end squares
-        n = Bfrom.index(choice) # index number of choice
-        pieceList[choice] = None    #remove BP from choice sq
-        to = Bto[n] # number of desired end sq for BP
-        pieceList[to] = BP # move BP to end sq
-        boole = True # redDot back on
-        flag = 3    # jump out 
-        # reset clock to 1!?!?
-                
-    position(pieceList)
-    #print(pieceList.index(WP1))
-        
+    pieces_show(pieceList)
+    print(pieceList)
+       
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
     clock.tick(1)
     
