@@ -33,27 +33,13 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.redDotRect = self.redDotImg.get_rect()
 
-#create WP instances 
-WPList = []
-for num in range(3):
-    WP = Pawn() 
-    WPList.append(WP)
-    #print(WP is WPList[0])  #TFF!!!
-    print(WP is WPList[num])  #TTT!!!
-  
-
+# single WP for now
 WP=Pawn()
 
-
-#print(WPList)
-print(WPList[0])
-#print (ctypes.cast(WPList[0],ctypes.py_object).value)
-#print (WPList[1].pos(boardDict, 1))
-WP = Pawn()
 #create BP instances
 BP = Pawn()
-BP = Pawn()
-BP = Pawn()
+#BP = Pawn()
+#BP = Pawn()
 # create red dot instances
 RD1 = RedDot()
 RD2 = RedDot()
@@ -61,29 +47,25 @@ boole = False
 flag = 1
 
 # position and show rect/images in pieceList positions
-#create position each WP pawn individually
-pieceList =[WP ,None, None,None, None,None ]
+pieceList =[None,WP ,None, None,None, None,BP, BP, BP ]
 
 # pieces_show code will show the pieces when run in the while loop!
-# WPList[num] works even though address returned and not WP 
 def pieces_show(pieceList):
-    for num in range(3):        
-        WPList[num].WPimgRect.topleft = WPList[num].pos(boardDict, num) 
-        #position pawn rect by boardDict values
-        screen.blit(WPList[num].WPimg,(WPList[num].WPimgRect))  #(image surface WP, positon)
-        pieceList.insert(num,WPList[num])
+    for num, piece in enumerate(pieceList):   
+        if piece == WP:
+            WP.WPimgRect.topleft = WP.pos(boardDict, num) 
+            #position pawn rect by boardDict values
+            screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
+        
         # black pawns
-        screen.blit(BP.BPimg,(BP.pos(boardDict, num+6)))
+        if piece == BP:
+            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
         #print(pieceList)
-
-
 
 #setup up from and to lists for WP
 fromList =[]
 toList = []
 
-# not recognising WP, fromList and toList not formed
-# geeks ctypes reference?
 def to_from (pieceList):
     for num in range(6):
         if pieceList[num] == WP:
