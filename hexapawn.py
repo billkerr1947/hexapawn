@@ -33,8 +33,10 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.redDotRect = self.redDotImg.get_rect()
 
-# single WP for now
-WP=Pawn()
+#WP = Pawn()
+WP1=Pawn()
+WP2=Pawn()
+WPList =[WP1,WP2]
 
 #create BP instances
 BP = Pawn()
@@ -44,22 +46,22 @@ RD2 = RedDot()
 boole = False
 flag = 1
 
-# position and show rect/images in pieceList positions
-pieceList =[WP, None ,WP, None,WP, None,BP, None, BP ]
-pieceDict ={0:WP, 1:None ,2:WP, 3:None,4:WP, 5:None,6:BP, 7:None, 8:BP }
+# position and show rect/images in pieceDict positions
+pieceDict ={0:WP1, 1:None ,2:WP2, 3:None,4:None, 5:None,6:BP, 7:None, 8:BP }
 
-# pieces_show code will show the pieces when run in the while loop!
-# convert to pieceDict?
-def pieces_show(pieceList):
-    for num, piece in enumerate(pieceList):   
-        if piece == WP:
-            WP.WPimgRect.topleft = WP.pos(boardDict, num) 
-            #position pawn rect by boardDict values
-            screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
+# pieces_show code  shows the pieces when run in the while loop
+def pieces_show(pieceDict):
+    for key in pieceDict:
+        for num, WP in enumerate(WPList):
+                if pieceDict[key] == WPList[num]:
+                    WP.WPimgRect.topleft = WP.pos(boardDict, key) 
+                    #position pawn rect by boardDict values
+                    screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
+                    #print(WP)
         
         # black pawns
-        if piece == BP:
-            screen.blit(BP.BPimg,(BP.pos(boardDict, num)))
+        #if pieceDict[key] == BP:
+        #    screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
         #print(pieceList)
 
 #setup up from and to lists for WP
@@ -68,23 +70,24 @@ toList = []
 
 def to_from (pieceDict):
     for key in range(6):
-        if pieceDict[key] == WP:
-            if pieceDict[key+3] == None:
-                fromList.append(key)
-                toList.append(key+3)
-            if (key % 3) > 0: 
-                # False for squares 0 & 3 (LH column), True for midddle & RH column
-                # WP can't capture diagonally to left from these squares
-                if pieceDict[key+2] == BP:
+        for num in range(2):
+            if pieceDict[key] == WPList[num]:
+                if pieceDict[key+3] == None:
                     fromList.append(key)
-                    toList.append(key+2)
-            if (key % 3) < 2: 
-                #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
-                # WP can't capture diagonally to right from these squares
-                if pieceDict[key+4] == BP:
-                    fromList.append(key)
-                    toList.append(key+4) 
-                    
+                    toList.append(key+3)
+                if (key % 3) > 0: 
+                    # False for squares 0 & 3 (LH column), True for midddle & RH column
+                    # WP can't capture diagonally to left from these squares
+                    if pieceDict[key+2] == BP:
+                        fromList.append(key)
+                        toList.append(key+2)
+                if (key % 3) < 2: 
+                    #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
+                    # WP can't capture diagonally to right from these squares
+                    if pieceDict[key+4] == BP:
+                        fromList.append(key)
+                        toList.append(key+4) 
+                        
             
     print (fromList)        
     print (toList)
@@ -99,18 +102,23 @@ while True:
             sys.exit()
             
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
-                begin = pieceList.index(WP)    # board pos of this WP
+            for WP in WPList:
+                if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
+                    print(pygame.mouse.get_pos())
+                
+                
+            #
+                #begin = pieceList.index(WP)    # board pos of this WP
                 # True if mouse clicks inside WPimgRect
-                boole = True #turn on redDot
-            if RD1.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                boole = False   #turn off redDot
-                end = begin + 3     # +3 for normal move
-                flag = 2    # move piece to new positions
-            if RD2.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                boole = False   #turn off redDot
-                end = begin + 4 #capture to right
-                flag = 2    # move piece to new positions
+                #boole = True #turn on redDot
+            #if RD1.redDotRect.collidepoint(pygame.mouse.get_pos()):
+                #boole = False   #turn off redDot
+                #end = begin + 3     # +3 for normal move
+                #flag = 2    # move piece to new positions
+            #if RD2.redDotRect.collidepoint(pygame.mouse.get_pos()):
+                #boole = False   #turn off redDot
+                #end = begin + 4 #capture to right
+                #flag = 2    # move piece to new positions
         
         
             #print(pygame.mouse.get_pos())
@@ -122,7 +130,7 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(0,150),end_pos=(450,150))
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
     
-    pieces_show(pieceList)
+    pieces_show(pieceDict)
     #print(pieceList)
        
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
