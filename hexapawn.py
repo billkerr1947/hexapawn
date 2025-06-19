@@ -4,7 +4,6 @@ import settings
 from settings import boardDict
 import random
 
-
 pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
 #create screen surface
@@ -33,10 +32,12 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.redDotRect = self.redDotImg.get_rect()
 
-#WP = Pawn()
+# make 3 instances of the WP
 WP1=Pawn()
 WP2=Pawn()
-WPList =[WP1,WP2]
+WP3=Pawn()
+# WP list
+WPList =[WP1,WP2,WP3]
 
 #create BP instances
 BP = Pawn()
@@ -46,10 +47,11 @@ RD2 = RedDot()
 boole = False
 flag = 1
 
-# position and show rect/images in pieceDict positions
-pieceDict ={0:WP1, 1:None ,2:WP2, 3:None,4:None, 5:None,6:BP, 7:None, 8:BP }
+#pieceDict shows pieces on their board positions
+pieceDict ={0:WP1, 1:WP2 ,2:WP3, 3:None,4:BP, 5:BP,6:BP, 7:None, 8:None }
 
-# pieces_show code  shows the pieces when run in the while loop
+# pieces_show code will show the pieces when run in the while loop!
+# excellent code here solving problems encountered
 def pieces_show(pieceDict):
     for key in pieceDict:
         for num, WP in enumerate(WPList):
@@ -60,8 +62,8 @@ def pieces_show(pieceDict):
                     #print(WP)
         
         # black pawns
-        #if pieceDict[key] == BP:
-        #    screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
+        if pieceDict[key] == BP:
+            screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
         #print(pieceList)
 
 #setup up from and to lists for WP
@@ -69,30 +71,28 @@ fromList =[]
 toList = []
 
 def to_from (pieceDict):
-    for key in range(6):
-        for num in range(2):
-            if pieceDict[key] == WPList[num]:
-                if pieceDict[key+3] == None:
+    for key in range(6):    # check squares 0 to 5
+        for num in range(len(WPList)):  #3
+            if pieceDict[key] == WPList[num]:   #if WPn detected
+                if pieceDict[key+3] == None:    # if nothing in front of WP
                     fromList.append(key)
                     toList.append(key+3)
                 if (key % 3) > 0: 
                     # False for squares 0 & 3 (LH column), True for midddle & RH column
                     # WP can't capture diagonally to left from these squares
-                    if pieceDict[key+2] == BP:
+                    if pieceDict[key+2] == BP:  # LH diagonal capture possible
                         fromList.append(key)
                         toList.append(key+2)
                 if (key % 3) < 2: 
                     #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
                     # WP can't capture diagonally to right from these squares
-                    if pieceDict[key+4] == BP:
+                    if pieceDict[key+4] == BP:  #RH diagonal capture possible
                         fromList.append(key)
                         toList.append(key+4) 
-                        
-            
-    print (fromList)        
-    print (toList)
-
-print(to_from(pieceDict))
+    
+to_from(pieceDict)
+print (f"fromList {fromList}")
+print (f"toList {toList}")
 
 while True:    
     for event in pygame.event.get():
