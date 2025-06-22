@@ -20,6 +20,7 @@ class Pawn:
         self.BPimg = pygame.image.load('images/blackPawn.png')
         self.BPimgRect = self.BPimg.get_rect() 
         self.WPSelected = pygame.image.load('images/whitePawnSelected.png')
+        self.WPflag = False
 
 #    pawn pos method -> input boardDict, num -> return board position (x, y)
     def pos(self, boardDict, num ):
@@ -44,8 +45,8 @@ BP = Pawn()
 # create red dot instances
 RD1 = RedDot()
 RD2 = RedDot()
-boole = False
-flag = 1
+#boole = False
+#Flag = False
 
 #pieceDict shows pieces on their board positions
 pieceDict ={0:WP1, 1:WP2 ,2:WP3, 3:None,4:BP, 5:BP,6:BP, 7:None, 8:None }
@@ -59,7 +60,11 @@ def pieces_show(pieceDict):
                     WP.WPimgRect.topleft = WP.pos(boardDict, key) 
                     #position pawn rect by boardDict values
                     screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
-                    #print(WP)
+                    if WP.WPflag:    # true when a WP rect clicked
+                        screen.blit(WP.WPSelected,(WP.WPimgRect)) # red image
+                        
+
+                        
         
         # black pawns
         if pieceDict[key] == BP:
@@ -104,6 +109,9 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             for WP in WPList:
                 if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
+                    WP.WPflag = True # flag for clicked WP (touch move!)
+                   
+                    
                     print(pygame.mouse.get_pos())
                 
                 
