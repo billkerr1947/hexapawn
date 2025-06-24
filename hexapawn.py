@@ -49,7 +49,7 @@ RD2 = RedDot()
 #Flag = False
 
 #pieceDict shows pieces on their board positions
-pieceDict ={0:WP1, 1:WP2 ,2:WP3, 3:None,4:BP, 5:BP,6:BP, 7:None, 8:None }
+pieceDict ={0:WP1, 1:None ,2:WP2, 3:None, 4:WP3, 5:None,6:BP, 7:BP, 8:BP }
 
 # pieces_show code will show the pieces when run in the while loop!
 # excellent code here solving problems encountered
@@ -62,10 +62,35 @@ def pieces_show(pieceDict):
                     screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
                     if WP.WPflag:    # true when a WP rect clicked
                         screen.blit(WP.WPSelected,(WP.WPimgRect)) # red image
-                        
+                        #Get the pieceDict key of the square for the WP which has been clicked
+                        squares = []
+                        for sq, val in pieceDict.items():
+                            if val == WP:
+                                squares.append(sq)
+                        #print(squares)
+                        n = squares[0]
+                        # modify fromList and toList for this WP, eg. WP1
+                        newFromList = []
+                        newToList = []
+                        for i, val in enumerate(fromList):
+                            if val==n:
+                                newFromList.append(fromList[i])
+                                newToList.append(toList[i])
+                                
+                        print (newFromList) 
+                        print (newToList)    
+                        if len(newToList)==1:
+                            RD1.redDotRect.topleft = (WP.pos(boardDict, newToList[0]))
+                            screen.blit(RD1.redDotImg,(RD1.redDotRect))
+                        elif len(newToList)==2:
+                            RD1.redDotRect.topleft = (WP.pos(boardDict, newToList[0]))
+                            screen.blit(RD1.redDotImg,(RD1.redDotRect))
+                            RD2.redDotRect.topleft = (WP.pos(boardDict, newToList[1]))
+                            screen.blit(RD2.redDotImg,(RD2.redDotRect))
+        
 
                         
-        
+                        
         # black pawns
         if pieceDict[key] == BP:
             screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
@@ -95,9 +120,9 @@ def to_from (pieceDict):
                         fromList.append(key)
                         toList.append(key+4) 
     
-to_from(pieceDict)
-print (f"fromList {fromList}")
-print (f"toList {toList}")
+#to_from(pieceDict)
+#print (f"fromList {fromList}")
+#print (f"toList {toList}")
 
 while True:    
     for event in pygame.event.get():
@@ -110,6 +135,14 @@ while True:
             for WP in WPList:
                 if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
                     WP.WPflag = True # flag for clicked WP (touch move!)
+                    to_from(pieceDict) # generates ALL possible moves after clicking pawn
+                    values = WP1
+                    keys = [key for key, val in pieceDict.items() if val == values]
+                    n = keys[0]
+                    for i, val in enumerate(fromList):
+                        if val==n:
+                            print(f"toList {toList}")
+
                    
                     
                     print(pygame.mouse.get_pos())
@@ -139,6 +172,9 @@ while True:
     pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(450,300))
     
     pieces_show(pieceDict)
+    #to_from(pieceDict)
+    #print (f"fromList {fromList}")
+    #print (f"toList {toList}")
     #print(pieceList)
        
     pygame.display.flip()   # updates entire display, must come afer fill(bg_colour)
