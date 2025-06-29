@@ -64,6 +64,7 @@ pieceDict ={0:WP1, 1:None ,2:WP3, 3:None, 4:WP2, 5:None,6:BP, 7:BP, 8:BP }
 # pieces_show code will show the pieces when run in the while loop!
 def pieces_show(pieceDict):
     flag3 = False   # for making red dots transparent
+    BP_flag = False
     for key in pieceDict:
         for num, WP in enumerate(WPList):
             if pieceDict[key] == WPList[num]:   # find the WPs
@@ -94,34 +95,31 @@ def pieces_show(pieceDict):
                 #print (pieceDict[0])
                 pieceDict[newToList[0]]=pieceDict[newFromList[0]] # move correct WP
                 pieceDict[newFromList[0]]=None  #rearrange Piece dictionary
-                #print(pieceDict[3])    # identical to previous [0] object
-                # after dictionary rearranged turn off flags
-                for RD in RDList:
-                    RD.redDotflag1 = False #reset both flags so RDs disappear
-                    RD.redDotflag2 = False
-                #flag3 = True    # transparency flag
-                for WP in WPList:
-                    WP.WPflag = False # so WPs change back to white after moving
                     
             elif len(newToList) == 2:
                 #print (pieceDict[0])
                 pieceDict[newToList[num]]=pieceDict[newFromList[num]] # move correct WP
                 pieceDict[newFromList[num]]=None  #rearrange Piece dictionary
                 #print(pieceDict[3])    # identical to previous [0] object
-                for RD in RDList:
-                    RD.redDotflag1 = False #reset flags so RDs disappear
-                    RD.redDotflag2 = False
-                #flag3 = True    # transparency flag
-                for WP in WPList:
-                    WP.WPflag = False # so WPs change back to white after moving
-                    
+    # after dictionary rearranged turn off flags            
+            for RD in RDList:
+                RD.redDotflag1 = False #reset flags so RDs disappear
+                RD.redDotflag2 = False
+            #flag3 = True    # transparency flag
+            for WP in WPList:
+                WP.WPflag = False # so WPs change back to white after moving            
     flag3 = True  
             # Make red dots transparent
-            # when I click RD it activates the other red dot!!!
     if flag3 == True: 
-        #RD1.redDotflag1 = False
         for RD in RDList:
             screen.blit(RD.RDtransparent,(RD.redDotRect)) 
+            
+    BP_flag = True
+    if BP_flag == True:
+        #if pieceDict[8] == BP:
+        #    print ('BP')
+        to_from_BP()
+        
 
 #setup up from and to lists for WP
 fromList =[]
@@ -173,7 +171,39 @@ def thisWP_to_from():
         # red dots can appear after newTo and from Lists adjusted
         for RD in RDList:
             RD.redDotflag1 = True   #RD1 and RD2 ready for placement and show
-    
+
+def to_from_BP():
+    fromList =[]
+    toList = []
+    BPList = []
+    for key in range(3,9): # check squares 3 to 8
+        if pieceDict[key] == BP:
+            BPList.append(key)
+            print (BPList)
+            
+    for num in BPList:
+        if pieceDict[num - 3] == None:
+            fromList.append(num)
+            toList.append(num - 3)
+            print(f"fromListBP = {fromList}")
+            print(f"toListBP = {toList}")
+'''                    
+            if (key-1)%3 < 2:
+                for WP in WPList:
+                    if WP == pieceDict[key-2]:
+                        fromList.append(key)
+                        toList.append(key-2)
+                        print(f"fromListBP = {fromList}")
+                        print(f"toListBP = {toList}")
+            if (key-1)%3 > 0:
+                for WP in WPList:
+                    if WP == pieceDict[key-4]:
+                        fromList.append(key)
+                        toList.append(key-4)
+                        print(f"fromListBP = {fromList}")
+                        print(f"toListBP = {toList}")    
+'''
+   
 while True:    
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
