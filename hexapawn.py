@@ -29,6 +29,7 @@ class Pawn:
         self.BPimgRect = self.BPimg.get_rect() 
         self.WPSelected = pygame.image.load('images/whitePawnSelected.png')
         self.WPflag = False # used for changing WP colour to red
+        self.BPflag = False
 
 #    pawn pos method: input boardDict, num -> return board position (x, y)
     def pos(self, boardDict, num ):
@@ -53,6 +54,7 @@ WPList =[WP1,WP2,WP3]
 
 #create BP instance, only one needed(?)
 BP = Pawn()
+BP.BPflag = False
 # create red dot instances
 RD1 = RedDot()
 RD2 = RedDot()
@@ -64,7 +66,7 @@ pieceDict ={0:WP1, 1:None ,2:WP3, 3:None, 4:WP2, 5:None,6:BP, 7:BP, 8:BP }
 # pieces_show code will show the pieces when run in the while loop!
 def pieces_show(pieceDict):
     flag3 = False   # for making red dots transparent
-    BP_flag = False
+    #BP_flag = False
     for key in pieceDict:
         for num, WP in enumerate(WPList):
             if pieceDict[key] == WPList[num]:   # find the WPs
@@ -101,25 +103,28 @@ def pieces_show(pieceDict):
                 pieceDict[newToList[num]]=pieceDict[newFromList[num]] # move correct WP
                 pieceDict[newFromList[num]]=None  #rearrange Piece dictionary
                 #print(pieceDict[3])    # identical to previous [0] object
-    # after dictionary rearranged turn off flags            
+    # after dictionary rearranged turn off red flags            
             for RD in RDList:
                 RD.redDotflag1 = False #reset flags so RDs disappear
                 RD.redDotflag2 = False
             #flag3 = True    # transparency flag
             for WP in WPList:
-                WP.WPflag = False # so WPs change back to white after moving            
+                WP.WPflag = False # so WPs change back to white after moving  
+            #activate BP here
+            BP.BPflag = True
+                      
     flag3 = True  
             # Make red dots transparent
     if flag3 == True: 
         for RD in RDList:
             screen.blit(RD.RDtransparent,(RD.redDotRect)) 
             
-    BP_flag = True
-    if BP_flag == True:
-        #if pieceDict[8] == BP:
-        #    print ('BP')
+            
+        
+    if BP.BPflag == True:
         to_from_BP()
         
+    
 
 #setup up from and to lists for WP
 fromList =[]
@@ -176,25 +181,37 @@ def to_from_BP():
     fromList =[]
     toList = []
     BPList = []
+    # make a list of BP squares
     for key in range(3,9): # check squares 3 to 8
         if pieceDict[key] == BP:
-            BPList.append(key)
+            BPList.append(key)  # list of squares containing a BP
             print (BPList)
+        
+    BP.BPflag = False    
+    print (BP.BPflag)
             
-    for num in BPList:
-        if pieceDict[num - 3] == None:
-            fromList.append(num)
-            toList.append(num - 3)
-            print(f"fromListBP = {fromList}")
-            print(f"toListBP = {toList}")
-'''                    
-            if (key-1)%3 < 2:
-                for WP in WPList:
-                    if WP == pieceDict[key-2]:
-                        fromList.append(key)
-                        toList.append(key-2)
+        
+            
+'''            
+        for num in BPList:
+            if pieceDict[num - 3] == None: # empty square in front of BP
+                fromList.append(num)
+                toList.append(num - 3)
+                print(f"fromListBP = {fromList}")   #[6, 8]
+                print(f"toListBP = {toList}")       #[3, 5]
+    
+    
+                  
+        if (key-1)%3 < 2: # square 3 & 6 False (RH diagonal banned)
+                        # square 4,5 & 7,8 true
+            for num in BPList:
+                for WP in WPList:   
+                    if WP == pieceDict[num-2]: # is WP on LH diagonal
+                        fromList.append(num)
+                        toList.append(num-2)
                         print(f"fromListBP = {fromList}")
                         print(f"toListBP = {toList}")
+
             if (key-1)%3 > 0:
                 for WP in WPList:
                     if WP == pieceDict[key-4]:
