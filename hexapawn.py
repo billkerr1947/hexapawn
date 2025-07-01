@@ -118,31 +118,7 @@ def pieces_show(pieceDict):
             
     if BP.BPflag == True:
         to_from_BP()
-        
-#setup up from and to lists for WP
-fromList =[]
-toList = []
 
-def to_from ():
-    for key in range(6):    # check squares 0 to 5
-        for num in range(len(WPList)):  #3
-            if pieceDict[key] == WPList[num]:   #if WPn detected
-                if pieceDict[key+3] == None:    # if nothing in front of WP
-                    fromList.append(key)
-                    toList.append(key+3)
-                if (key % 3) > 0: 
-                    # False for squares 0 & 3 (LH column), True for midddle & RH column
-                    # WP can't capture diagonally to left from these squares
-                    if pieceDict[key+2] == BP:  # LH diagonal capture possible
-                        fromList.append(key)
-                        toList.append(key+2)
-                if (key % 3) < 2: 
-                    #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
-                    # WP can't capture diagonally to right from these squares
-                    if pieceDict[key+4] == BP:  #RH diagonal capture possible
-                        fromList.append(key)
-                        toList.append(key+4) 
-          
 # make newToFrom & To lists for the WP which is clicked
 newFromList = []
 newToList = []
@@ -154,21 +130,38 @@ def thisWP_to_from():
             for sq, val in pieceDict.items():
                 if val == WP:
                     sqList.append(sq)
-            #print(f"square = {sqList}")
-            square = sqList[0]
+            print(f"square = {sqList}")
+            square = sqList[0]  # sq of clicked wp
             #print(pieceDict) #0:WP
             # modify fromList and toList for this WP
-            for i, val in enumerate(fromList):
-                if val==square: #changes when WP moves
-                    newFromList.append(fromList[i])
-                    newToList.append(toList[i])
-            print(f"fromList {fromList}")
-            print(f"toList {toList}")
-            print (f"newFromList {newFromList}")
-            print(f"newToList {newToList}")
-        # red dots can appear after newTo and from Lists adjusted
-        for RD in RDList:
-            RD.redDotflag1 = True   #RD1 and RD2 ready for placement and show
+        #if pieceDict[key] == square:
+            if pieceDict[square + 3] == None:
+                newFromList.append(square)
+                newToList.append(square + 3)
+                print (f"newFromList {newFromList}")
+                print(f"newToList {newToList}")
+            for key in range(6):    # check squares 0 to 5 for BPs
+                if (key % 3) > 0: 
+                        # False for squares 0 & 3 (LH column), True for midddle & RH column
+                        # WP can't capture diagonally to left from these squares
+                    if square == (key):   
+                        if pieceDict[key+2] == BP:  # LH diagonal capture possible
+                            newFromList.append(square)
+                            newToList.append(square+2)
+                            print (f"newFromList {newFromList}")
+                            print(f"newToList {newToList}")
+                if (key % 3) < 2: 
+                    if square == (key):
+                        #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
+                        # WP can't capture diagonally to right from these squares
+                        if pieceDict[key+4] == BP:  #RH diagonal capture possible
+                            newFromList.append(square)
+                            newToList.append(square+4)
+                            print (f"newFromList {newFromList}")
+                            print(f"newToList {newToList}")
+    # red dots can appear after newTo and from Lists adjusted
+    for RD in RDList:
+        RD.redDotflag1 = True   #RD1 and RD2 ready for placement and show  
 
 def to_from_BP():
     fromList =[]
@@ -225,7 +218,7 @@ while True:
             for WP in WPList:
                 if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
                     WP.WPflag = True # flag for clicked WP (touch move!)
-                    to_from() # generates ALL possible moves after clicking pawn
+                    #to_from() # generates ALL possible moves after clicking pawn
                     thisWP_to_from() #to&from just for this clicked WP
             
             # for flag 2 activate RD1 or 2 when clicked
