@@ -65,8 +65,7 @@ pieceDict ={0:WP1, 1:None ,2:WP3, 3:None, 4:WP2, 5:None,6:BP, 7:BP, 8:BP }
 
 # pieces_show code will show the pieces when run in the while loop!
 def pieces_show(pieceDict):
-    flag3 = False   # for making red dots transparent
-    #BP_flag = False
+    # locate WPs in pieceDict and show them as clickable objects
     for key in pieceDict:
         for num, WP in enumerate(WPList):
             if pieceDict[key] == WPList[num]:   # find the WPs
@@ -107,25 +106,19 @@ def pieces_show(pieceDict):
             for RD in RDList:
                 RD.redDotflag1 = False #reset flags so RDs disappear
                 RD.redDotflag2 = False
-            #flag3 = True    # transparency flag
             for WP in WPList:
                 WP.WPflag = False # so WPs change back to white after moving  
             #activate BP here
             BP.BPflag = True
-                      
-    flag3 = True  
+            
             # Make red dots transparent
-    if flag3 == True: 
+    if RD.redDotflag1 == False and RD.redDotflag2 == False:
         for RD in RDList:
             screen.blit(RD.RDtransparent,(RD.redDotRect)) 
             
-            
-        
     if BP.BPflag == True:
         to_from_BP()
         
-    
-
 #setup up from and to lists for WP
 fromList =[]
 toList = []
