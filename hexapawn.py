@@ -115,6 +115,8 @@ def pieces_show(pieceDict):
             
     if BP.BPflag == True:
         to_from_BP()
+    
+    #moveBP()
 
 # make newToFrom & To lists for the WP which is clicked
 newFromList = []
@@ -193,9 +195,19 @@ def to_from_BP():
                             newToList.append(num-2)
                             print(f"fromListBP = {newFromList}")
                             print(f"toListBP = {newToList}")
-
+    # rearrage pieceDict, move BP
+    r = random.randint(0, len(newFromList)-1)
+    print(f"newFromList {newFromList}")
+    print(f"newToList {newToList}")
+    print(len(newFromList))
+    print(r)
+    pieceDict[newToList[r]] = pieceDict[newFromList[r]]
+    pieceDict[newFromList[r]]  = None
     BP.BPflag = False
-        
+
+#def moveBP(pieceDc):
+#    pieceDict[newToList[0]] = pieceDict[newFromList[0]]
+#    pieceDict[newFromList[0]]  = None
     
     
 while True:    
