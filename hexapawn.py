@@ -115,13 +115,16 @@ def pieces_show(pieceDict):
             
     if BP.BPflag == True:
         to_from_BP()
+        BP.BPflag = False
     
-    #moveBP()
+    #print(f"120 newToList {}")
+    moveBP(pieceDict, *to_from_BP())
 
 # make newToFrom & To lists for the WP which is clicked
-newFromList = []
-newToList = []
+
 def thisWP_to_from(): 
+    newFromList = []
+    newToList = []
     for WP in WPList:
         if WP.WPflag:    # true only for the WP rect clicked
         #Get the pieceDict key of the square for the WP which has been clicked
@@ -159,6 +162,7 @@ def thisWP_to_from():
     # red dots can appear after newTo and from Lists adjusted
     for RD in RDList:
         RD.redDotflag1 = True   #RD1 and RD2 ready for placement and show  
+    return newFromList, newToList
 
 def to_from_BP():
     newFromList =[]
@@ -185,6 +189,8 @@ def to_from_BP():
                         if key + 4 == (num):    #RH diagonal from black side
                             newFromList.append(num)
                             newToList.append(num-4)
+                            print(f"fromListBP = {newFromList}")
+                            print(f"toListBP = {newToList}")
                             
         if key%3 > 0:   # key 0 & 3 False (RH diagonal from black side banned)
             for num in BPList:
@@ -195,7 +201,15 @@ def to_from_BP():
                             newToList.append(num-2)
                             print(f"fromListBP = {newFromList}")
                             print(f"toListBP = {newToList}")
-    # rearrage pieceDict, move BP
+    
+    return newFromList, newToList
+
+#*to_from_BP()
+
+
+                        
+#rearrage pieceDict, move BP
+def moveBP(pieceDict, newFromList, newToList):
     r = random.randint(0, len(newFromList)-1)
     print(f"newFromList {newFromList}")
     print(f"newToList {newToList}")
@@ -203,7 +217,20 @@ def to_from_BP():
     print(r)
     pieceDict[newToList[r]] = pieceDict[newFromList[r]]
     pieceDict[newFromList[r]]  = None
-    BP.BPflag = False
+    # remake WPList (a WP may have been captured)
+    print (f"WPList={WPList}")
+    print (pieceDict)
+    return pieceDict
+    
+    
+''' 
+    for key in PieceDict:
+        WPList = []
+        if pieceDict[key] == WP1 or WP2 or WP3:
+            WPList.append(pieceDict[key])
+            
+'''                         
+    
 
 #def moveBP(pieceDc):
 #    pieceDict[newToList[0]] = pieceDict[newFromList[0]]
