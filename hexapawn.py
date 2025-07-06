@@ -61,114 +61,110 @@ RD1 = RedDot()
 RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
-newFromList = []    # require initialisaton 
-newToList = []
+fromList = []    # require initialisaton 
+toList = []
 
-#pieceDict shows pieces on their (initial) board positions
-pieceDict ={0:WP1, 1:WP2 ,2:WP3, 3:None, 4:None, 5:None,6:BP, 7:BP, 8:BP }
+#pieceList shows pieces on their (initial) board positions
+pieceList =[None, WP2 ,WP3, None, WP1, None, BP, BP, BP ]
 
 # main is in the while loop!
-def main(pieceDict): # dictionary changes to show game progress
-    piecesShow(pieceDict)  
-    redDots()
-    rearrange_pieceDict(pieceDict)
-    #piecesShow(pieceDict)  # run the view again
+def main(pieceList): # dictionary changes to show game progress
+    piecesShow(pieceList)  
+    WP_toFrom() # get to&from lists for this clicked WP
+    
+    #redDots()
+    #rearrange_pieceList(pieceList)
+    #piecesShow(pieceList)  # run the view again
     #turnFlagsOff()  # flags go off before next click!
     #activate BPs here, correct indentation is a mystery!!!
     #BP.BPflag = True
-    # get BP to and from possibilities        
+    # get BP to and from possibilities   
+'''         
     if BP.BPflag == True:
         to_from_BP()
         # move BP and rearrange dictionary
-        moveBP(pieceDict, *to_from_BP()) #unpack tuple
+        moveBP(pieceList, *to_from_BP()) #unpack tuple
         BP.BPflag = False   # stop BP moving
     
     # update WP list here since a WP may be gone
     
-    # view pieceDict
-    #print (f"86 newFromList {newFromList}")
-    #print (f"newToList {newToList}")
-    #print(f"88 {pieceDict}") # dictionary updated
-
-def piecesShow(pieceDict):
-    for key in pieceDict:
-        if BP.BPflag == False:    
-            for num, WP in enumerate(WPList):
-                if pieceDict[key] == WPList[num]:   # find the WPs
-                    WP.WPimgRect.topleft = WP.pos(boardDict, key) 
-                    #position pawn rect by boardDict values
-                    if WP.WPflag2 == False:
-                        screen.blit(WP.WPimg,(WP.WPimgRect))  # white pawn
-                    if WP.WPflag2 == True: # if WP clicked turn to red
-                        screen.blit(WP.WPSelected,(WP.WPimgRect)) # red image
-                    
-                if WP.WPflag1 == True: 
-                    thisWP_to_from() # get to&from lists for this clicked WP
-                    # also RDflag1 activated in this function for appearance
-                    #print (f"82 {thisWP_to_from()}")
-                    WP.WPflag1 = False   #  prevent to & from lists looping
-                            
+    # view pieceList
+    #print (f"86 fromList {fromList}")
+    #print (f"toList {toList}")
+    #print(f"88 {pieceList}") # dictionary updated
+'''
+def piecesShow(pieceList):
+    for key, item in enumerate(pieceList):
+        for num, WP in enumerate(WPList):
+            if pieceList[key] == WPList[num]:   # find the WPs
+                WP.WPimgRect.topleft = WP.pos(boardDict, key) 
+                #position pawn rect by boardDict values
+                if WP.WPflag2 == False:
+                    screen.blit(WP.WPimg,(WP.WPimgRect))  # white pawn
+                if WP.WPflag2 == True: # if WP clicked turn to red
+                    screen.blit(WP.WPSelected,(WP.WPimgRect)) # red image
+                        
         # black pawns images only           
-        if pieceDict[key] == BP:
+        if pieceList[key] == BP:
             screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
 
-def thisWP_to_from(): 
+def WP_toFrom():
     for WP in WPList:
-        if WP.WPflag1:    # true only for the WP rect clicked
-        #Get the pieceDict key of the square for the WP which has been clicked
-            sqList = []
-            for sq, val in pieceDict.items():
-                if val == WP:
-                    sqList.append(sq)
-            square = sqList[0]  # sq of clicked WP
-            # modify fromList and toList for this WP
-            if pieceDict[square + 3] == None:   # nothing in front of this WP
-                newFromList.append(square)
-                newToList.append(square + 3)
-                #print (f"newFromList {newFromList}")
-                #print(f"newToList {newToList}")
+        if WP.WPflag1:    # true only for the WP rect clicked 
+        #Get the pieceList index of the square for the WP which has been clicked
+            square = pieceList.index(WP)
+            # get fromList and toList for this WP
+            if pieceList[square + 3] == None:   # nothing in front of this WP
+                fromList.append(square)
+                toList.append(square + 3)
+                print (f"fromList {fromList}")
+                print(f"toList {toList}")
+                
             for key in range(6):    # check squares 0 to 5 for WP
                 if (key % 3) > 0: 
                     # False for squares 0 & 3 (LH column), True for midddle & RH column
                     # WP can't capture diagonally to left from these squares
                     if square == key:   #get key for this WP
-                        if pieceDict[key+2] == BP:  # LH diagonal capture possible
-                            newFromList.append(square)
-                            newToList.append(square+2)
-                            #print (f"newFromList {newFromList}")
-                            #print(f"newToList {newToList}")
+                        if pieceList[key+2] == BP:  # LH diagonal capture possible
+                            fromList.append(square)
+                            toList.append(square+2)
+                            print (f"135 fromList {fromList}")
+                            print(f"136 toList {toList}")
+                            
                 if (key % 3) < 2: 
                     if square == (key):
                     #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
                     # WP can't capture diagonally to right from these squares
-                        if pieceDict[key+4] == BP:  #RH diagonal capture possible
-                            newFromList.append(square)
-                            newToList.append(square+4)
-                            #print (f"newFromList {newFromList}")
-                            #print(f"newToList {newToList}")
+                        if pieceList[key+4] == BP:  #RH diagonal capture possible
+                            fromList.append(square)
+                            toList.append(square+4)
+                            print (f"145 fromList {fromList}")
+                            print(f"146 toList {toList}")
+        WP.WPflag1 = False   #  prevent to & from lists looping
     for RD in RDList:
         RD.redDotflag1 = True   
         # triggers code that shows Rdots for changing to from lists
+'''
    
-    print (f" 185 newFromListWP {newFromList}")
-    print(f"186 newToListWP {newToList}")                           
-    return newFromList, newToList   # not necessary initially
+    print (f" 185 fromListWP {fromList}")
+    print(f"186 toListWP {toList}")                           
+    return fromList, toList   # not necessary initially
 
 
-    
+'''   
 def redDots():        
     # put clickable red dots on screen in correct positions using to lists
-    #print(f"93 newFromList {newFromList}")
-    #print(f"newToList {newToList}")
-    # print(f"tuple {thisWP_to_from()}")
+    #print(f"93 fromList {fromList}")
+    #print(f"toList {toList}")
+    # print(f"tuple {WP_toFrom()}")
     for num, RD in enumerate(RDList):   # loop through RD1, RD2
         if RD.redDotflag1 == True and RD.redDotflag2 == False: 
             # flag1: RDs appear for current to from lists, flag2 False until RD clicked
-            if len(newToList) == 1:
-                RD.redDotRect.topleft = (WP.pos(boardDict, newToList[0]))
+            if len(toList) == 1:
+                RD.redDotRect.topleft = (WP.pos(boardDict, toList[0]))
                 screen.blit(RD.redDotImg,(RD.redDotRect))
-            elif len(newToList)==2:
-                RD.redDotRect.topleft = (WP.pos(boardDict, newToList[num]))
+            elif len(toList)==2:
+                RD.redDotRect.topleft = (WP.pos(boardDict, toList[num]))
                 screen.blit(RD.redDotImg,(RD.redDotRect))
         if RD.redDotflag1 == False and RD.redDotflag2 == False: 
             # both flags set to false after RD clicked
@@ -176,21 +172,21 @@ def redDots():
                 screen.blit(RD.RDtransparent,(RD.redDotRect)) 
             
 
-def rearrange_pieceDict(pieceDict):       
-    # Make WP move (rearrange pieceDict) when RD clicked then deactivate flags
+def rearrange_pieceList(pieceList):       
+    # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
     for num, RD in enumerate(RDList):   #num corresponds to RD1&2
         if RD.redDotflag2 == True: # True only for the RD which is clicked
-            if len(newToList) == 1: # only one move possible
-                pieceDict[newToList[0]]=WP # move correct WP
-                pieceDict[newFromList[0]]=None  #rearrange Piece dictionary
-            elif len(newToList) == 2:
-                pieceDict[newToList[num]]=WP # move correct WP
-                pieceDict[newFromList[num]]=None  #rearrange Piece dictionary
+            if len(toList) == 1: # only one move possible
+                pieceList[toList[0]]=WP # move correct WP
+                pieceList[fromList[0]]=None  #rearrange Piece dictionary
+            elif len(toList) == 2:
+                pieceList[toList[num]]=WP # move correct WP
+                pieceList[fromList[num]]=None  #rearrange Piece dictionary
     
   
 # make newToFrom & To lists for the WP which is clicked
 
-'''
+
 def turnFlagsOff():
         # after dictionary rearranged & WP moves turn off red flags            
     for RD in RDList:
@@ -198,71 +194,71 @@ def turnFlagsOff():
         RD.redDotflag2 = False  # click control?
     for WP in WPList:
         WP.WPflag2 = False
-'''
+
 def to_from_BP():
-    newFromList =[]
-    newToList = []
+    fromList =[]
+    toList = []
     BPList = []
     # make a list of BP squares
     for key in range(3,9): # check squares 3 to 8
-        if pieceDict[key] == BP:
+        if pieceList[key] == BP:
             BPList.append(key)  # list of squares containing a BP
             #print (BPList)
             
     for num in BPList:
-        if pieceDict[num - 3] == None: # empty square in front of BP
-            newFromList.append(num)
-            newToList.append(num - 3)
-            #print(f"fromListBP = {newFromList}")   #[6, 8]
-            #print(f"toListBP = {newToList}")       #[3, 5]
+        if pieceList[num - 3] == None: # empty square in front of BP
+            fromList.append(num)
+            toList.append(num - 3)
+            #print(f"fromListBP = {fromList}")   #[6, 8]
+            #print(f"toListBP = {toList}")       #[3, 5]
 
     for key in range(6):
         if key % 3 < 2: # key 2 & 5 False (LH diagonal from black side banned)
             for num in BPList:
                 for WP in WPList: # inner loop run for each outer loop
-                    if pieceDict[key] == WP:    # find WP keys
+                    if pieceList[key] == WP:    # find WP keys
                         if key + 4 == (num):    #RH diagonal from black side
-                            newFromList.append(num)
-                            newToList.append(num-4)
-                            #print(f" 210 fromListBP = {newFromList}")
-                            #print(f"toListBP = {newToList}")
+                            fromList.append(num)
+                            toList.append(num-4)
+                            #print(f" 210 fromListBP = {fromList}")
+                            #print(f"toListBP = {toList}")
                             
         if key%3 > 0:   # key 0 & 3 False (RH diagonal from black side banned)
             for num in BPList:
                 for WP in WPList:
-                    if pieceDict[key] == WP:
+                    if pieceList[key] == WP:
                         if key + 2 == (num):
-                            newFromList.append(num)
-                            newToList.append(num-2)
+                            fromList.append(num)
+                            toList.append(num-2)
                             
-    print(f" 227 fromListBP = {newFromList}")
-    print(f"228 toListBP = {newToList}")
-    return newFromList, newToList
+    print(f" 227 fromListBP = {fromList}")
+    print(f"228 toListBP = {toList}")
+    return fromList, toList
     # this tuple is unpacked on line 108
 print(f"225 tuple to_from_BP {to_from_BP()}")
-#rearrage pieceDict, move BP
+#rearrage pieceList, move BP
 # NFL & NTL here needed for unpacking of tuple
-def moveBP(pieceDict, newFromList, newToList):
-    r = random.randint(0, len(newFromList)-1)
-    pieceDict[newToList[r]] = BP
-    pieceDict[newFromList[r]]  = None
+def moveBP(pieceList, fromList, toList):
+    r = random.randint(0, len(fromList)-1)
+    pieceList[toList[r]] = BP
+    pieceList[fromList[r]]  = None
     # remake WPList (a WP may have been captured)
     #print (f"WPList={WPList}")
-    #print (pieceDict)
-    return pieceDict
+    #print (pieceList)
+    return pieceList
 
 #def WP_ID (ID):
 #    if ID ==
     
     
-''' 
+
 # after  BPs move check the WPList still valid
-    for key in PieceDict:
+    for key in pieceList:
         WPList = []
-        if pieceDict[key] == WP1 or WP2 or WP3:
-            WPList.append(pieceDict[key])
+        if pieceList[key] == WP1 or WP2 or WP3:
+            WPList.append(pieceList[key])
             
-'''                         
+                      
 while True:    
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
@@ -280,10 +276,10 @@ while True:
             # for flag 2 activate RD1 or 2 when clicked
             for RD in RDList:
                 if RD.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                    RD.redDotflag2 = True # rearrange pieceDict
+                    RD.redDotflag2 = True # rearrange pieceList
 
     grid(settings.bg_colour)
-    main(pieceDict) # show pieces
+    main(pieceList) # show pieces
        
     pygame.display.flip()   # updates entire display
     clock.tick(1)   # speed up clock later
