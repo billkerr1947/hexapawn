@@ -61,6 +61,9 @@ RD1 = RedDot()
 RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
+newFromList = []    # require initialisaton 
+newToList = []
+
 #pieceDict shows pieces on their (initial) board positions
 pieceDict ={0:WP1, 1:WP2 ,2:WP3, 3:None, 4:None, 5:None,6:BP, 7:BP, 8:BP }
 
@@ -68,9 +71,9 @@ pieceDict ={0:WP1, 1:WP2 ,2:WP3, 3:None, 4:None, 5:None,6:BP, 7:BP, 8:BP }
 def main(pieceDict): # dictionary changes to show game progress
     piecesShow(pieceDict)  
     redDots()
-    WPmove(pieceDict)
-    piecesShow(pieceDict)  # run the view again
-    turnFlagsOff()  # flags go off before next click!!! fix this
+    rearrange_pieceDict(pieceDict)
+    #piecesShow(pieceDict)  # run the view again
+    #turnFlagsOff()  # flags go off before next click!
     #activate BPs here, correct indentation is a mystery!!!
     #BP.BPflag = True
     # get BP to and from possibilities        
@@ -95,8 +98,8 @@ def piecesShow(pieceDict):
                     WP.WPimgRect.topleft = WP.pos(boardDict, key) 
                     #position pawn rect by boardDict values
                     if WP.WPflag2 == False:
-                        screen.blit(WP.WPimg,(WP.WPimgRect))  #(image surface WP, positon)
-                    elif WP.WPflag2 == True: # if WP clicked turn to red
+                        screen.blit(WP.WPimg,(WP.WPimgRect))  # white pawn
+                    if WP.WPflag2 == True: # if WP clicked turn to red
                         screen.blit(WP.WPSelected,(WP.WPimgRect)) # red image
                     
                 if WP.WPflag1 == True: 
@@ -108,35 +111,7 @@ def piecesShow(pieceDict):
         # black pawns images only           
         if pieceDict[key] == BP:
             screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
-    
-def redDots():        
-    # put clickable red dots on screen in correct positions using to lists
-    #print(f"93 newFromList {newFromList}")
-    #print(f"newToList {newToList}")
-    # print(f"tuple {thisWP_to_from()}")
-    for num, RD in enumerate(RDList):   # loop through RD1, RD2
-        if RD.redDotflag1 == True: # we can see the RDs
-            if len(newToList) == 1:
-                RD.redDotRect.topleft = (WP.pos(boardDict, newToList[0]))
-                screen.blit(RD.redDotImg,(RD.redDotRect))
-            elif len(newToList)==2:
-                RD.redDotRect.topleft = (WP.pos(boardDict, newToList[num]))
-                screen.blit(RD.redDotImg,(RD.redDotRect))
 
-def WPmove(pieceDict):       
-    # Make WP move (rearrange pieceDict) when RD clicked then deactivate flags
-    for num, RD in enumerate(RDList):   #num corresponds to RD1&2
-        if RD.redDotflag2 == True: # True only for the RD which is clicked
-            if len(newToList) == 1: # only one move possible
-                pieceDict[newToList[0]]=WP # move correct WP
-                pieceDict[newFromList[0]]=None  #rearrange Piece dictionary
-            elif len(newToList) == 2:
-                pieceDict[newToList[num]]=WP # move correct WP
-                pieceDict[newFromList[num]]=None  #rearrange Piece dictionary
-  
-# make newToFrom & To lists for the WP which is clicked
-newFromList = []    # require initialisaton 
-newToList = []
 def thisWP_to_from(): 
     for WP in WPList:
         if WP.WPflag1:    # true only for the WP rect clicked
@@ -172,25 +147,58 @@ def thisWP_to_from():
                             #print (f"newFromList {newFromList}")
                             #print(f"newToList {newToList}")
     for RD in RDList:
-        RD.redDotflag1 = True   ## so red dots will show
+        RD.redDotflag1 = True   
+        # triggers code that shows Rdots for changing to from lists
    
     print (f" 185 newFromListWP {newFromList}")
     print(f"186 newToListWP {newToList}")                           
     return newFromList, newToList   # not necessary initially
 
+
+    
+def redDots():        
+    # put clickable red dots on screen in correct positions using to lists
+    #print(f"93 newFromList {newFromList}")
+    #print(f"newToList {newToList}")
+    # print(f"tuple {thisWP_to_from()}")
+    for num, RD in enumerate(RDList):   # loop through RD1, RD2
+        if RD.redDotflag1 == True and RD.redDotflag2 == False: 
+            # flag1: RDs appear for current to from lists, flag2 False until RD clicked
+            if len(newToList) == 1:
+                RD.redDotRect.topleft = (WP.pos(boardDict, newToList[0]))
+                screen.blit(RD.redDotImg,(RD.redDotRect))
+            elif len(newToList)==2:
+                RD.redDotRect.topleft = (WP.pos(boardDict, newToList[num]))
+                screen.blit(RD.redDotImg,(RD.redDotRect))
+        if RD.redDotflag1 == False and RD.redDotflag2 == False: 
+            # both flags set to false after RD clicked
+            for RD in RDList:
+                screen.blit(RD.RDtransparent,(RD.redDotRect)) 
+            
+
+def rearrange_pieceDict(pieceDict):       
+    # Make WP move (rearrange pieceDict) when RD clicked then deactivate flags
+    for num, RD in enumerate(RDList):   #num corresponds to RD1&2
+        if RD.redDotflag2 == True: # True only for the RD which is clicked
+            if len(newToList) == 1: # only one move possible
+                pieceDict[newToList[0]]=WP # move correct WP
+                pieceDict[newFromList[0]]=None  #rearrange Piece dictionary
+            elif len(newToList) == 2:
+                pieceDict[newToList[num]]=WP # move correct WP
+                pieceDict[newFromList[num]]=None  #rearrange Piece dictionary
+    
+  
+# make newToFrom & To lists for the WP which is clicked
+
+'''
 def turnFlagsOff():
         # after dictionary rearranged & WP moves turn off red flags            
     for RD in RDList:
         RD.redDotflag1 = False #reset flags so RDs disappear
-        RD.redDotflag2 = False
-        
-            # Make red dots transparent after WP move
-        if RD.redDotflag1 == False and RD.redDotflag2 == False:
-            for RD in RDList:
-                screen.blit(RD.RDtransparent,(RD.redDotRect)) 
-
-#print (f"175 {thisWP_to_from()}") # empty lists?
-
+        RD.redDotflag2 = False  # click control?
+    for WP in WPList:
+        WP.WPflag2 = False
+'''
 def to_from_BP():
     newFromList =[]
     newToList = []
@@ -270,10 +278,9 @@ while True:
                     
             
             # for flag 2 activate RD1 or 2 when clicked
-            if RD1.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                RD1.redDotflag2 = True # activate RD1&2 pawn moves
-            if RD2.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                RD2.redDotflag2 = True # activate RD1&2 pawn moves
+            for RD in RDList:
+                if RD.redDotRect.collidepoint(pygame.mouse.get_pos()):
+                    RD.redDotflag2 = True # rearrange pieceDict
 
     grid(settings.bg_colour)
     main(pieceDict) # show pieces
