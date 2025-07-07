@@ -43,9 +43,12 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.RDtransparent = pygame.image.load('images/redDotTransparent.png')
         self.redDotRect = self.redDotImg.get_rect()
-        self.redDotflag1 = False    # for red dots appearinng
+        #self.toFromReady = False    # for red dots appearinng
         self.redDotflag2 = False    # for red dot clicking
 
+fromList = []   # require initialisaton 
+toList = []
+        
 # make 3 instances of the WP
 WP1=Pawn() 
 WP2=Pawn()
@@ -61,21 +64,18 @@ RD1 = RedDot()
 RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
-fromList = []    # require initialisaton 
-toList = []
 
 #pieceList shows pieces on their (initial) board positions
-pieceList =[None, WP2 ,WP3, None, WP1, None, BP, BP, BP ]
+pieceList =[WP1, None ,WP3, None, WP2, None, BP, BP, BP ]
 
 # main is in the while loop!
-def main(pieceList): # dictionary changes to show game progress
-    piecesShow(pieceList)  
+def main(): # list changes to show game progress
+    piecesShow()  
     WP_toFrom() # get to&from lists for this clicked WP
-    
-    #redDots()
-    #rearrange_pieceList(pieceList)
+    redDots()
+    rearrange_pieceList(pieceList)
     #piecesShow(pieceList)  # run the view again
-    #turnFlagsOff()  # flags go off before next click!
+    turnFlagsOff()  # flags go off before next click!
     #activate BPs here, correct indentation is a mystery!!!
     #BP.BPflag = True
     # get BP to and from possibilities   
@@ -93,7 +93,7 @@ def main(pieceList): # dictionary changes to show game progress
     #print (f"toList {toList}")
     #print(f"88 {pieceList}") # dictionary updated
 '''
-def piecesShow(pieceList):
+def piecesShow():
     for key, item in enumerate(pieceList):
         for num, WP in enumerate(WPList):
             if pieceList[key] == WPList[num]:   # find the WPs
@@ -141,9 +141,7 @@ def WP_toFrom():
                             print (f"145 fromList {fromList}")
                             print(f"146 toList {toList}")
         WP.WPflag1 = False   #  prevent to & from lists looping
-    for RD in RDList:
-        RD.redDotflag1 = True   
-        # triggers code that shows Rdots for changing to from lists
+
 '''
    
     print (f" 185 fromListWP {fromList}")
@@ -157,44 +155,59 @@ def redDots():
     #print(f"93 fromList {fromList}")
     #print(f"toList {toList}")
     # print(f"tuple {WP_toFrom()}")
-    for num, RD in enumerate(RDList):   # loop through RD1, RD2
-        if RD.redDotflag1 == True and RD.redDotflag2 == False: 
-            # flag1: RDs appear for current to from lists, flag2 False until RD clicked
-            if len(toList) == 1:
-                RD.redDotRect.topleft = (WP.pos(boardDict, toList[0]))
-                screen.blit(RD.redDotImg,(RD.redDotRect))
-            elif len(toList)==2:
-                RD.redDotRect.topleft = (WP.pos(boardDict, toList[num]))
-                screen.blit(RD.redDotImg,(RD.redDotRect))
-        if RD.redDotflag1 == False and RD.redDotflag2 == False: 
-            # both flags set to false after RD clicked
-            for RD in RDList:
-                screen.blit(RD.RDtransparent,(RD.redDotRect)) 
+    if len(toList) == 1:
+        RD1.redDotRect.topleft = (WP.pos(boardDict, toList[0]))
+        screen.blit(RD1.redDotImg,(RD1.redDotRect))
+    elif len(toList)==2:
+        for num, RD in enumerate(RDList):   # loop through RD1, RD2
+            RD.redDotRect.topleft = (WP.pos(boardDict, toList[num]))
+            screen.blit(RD.redDotImg,(RD.redDotRect))
             
 
 def rearrange_pieceList(pieceList):       
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
-    for num, RD in enumerate(RDList):   #num corresponds to RD1&2
-        if RD.redDotflag2 == True: # True only for the RD which is clicked
-            if len(toList) == 1: # only one move possible
-                pieceList[toList[0]]=WP # move correct WP
-                pieceList[fromList[0]]=None  #rearrange Piece dictionary
-            elif len(toList) == 2:
-                pieceList[toList[num]]=WP # move correct WP
-                pieceList[fromList[num]]=None  #rearrange Piece dictionary
+    if len(toList) == 1: # only one move possible
+        if RD1.redDotflag2 == True: # True when RD1 clicked
+            getPawn = pieceList[fromList[0]]
+            getNone = pieceList[toList[0]]
+            pieceList[toList[0]]=getPawn # move correct WP?
+            pieceList[fromList[0]]=getNone  #rearrange pieceList
+            RD1.redDotflag2 = False
+            print(f"184 {pieceList}")
+            
+    elif len(toList) == 2:
+        for num, RD in enumerate(RDList):   #num corresponds to RD1&2
+            if RD.redDotflag2 == True:
+                getPawn = pieceList[fromList[num]]
+                getNone = pieceList[toList[num]]
+                pieceList[toList[num]]=getPawn # move correct WP?
+                pieceList[fromList[num]]=getNone  #rearrange pieceList
+                RD.redDotflag2 = False
+                print(f"184 {pieceList}")
+    # transparency not working, function over????????            
+    
+
     
   
 # make newToFrom & To lists for the WP which is clicked
 
 
 def turnFlagsOff():
-        # after dictionary rearranged & WP moves turn off red flags            
-    for RD in RDList:
-        RD.redDotflag1 = False #reset flags so RDs disappear
-        RD.redDotflag2 = False  # click control?
+    #for RD in RDList:  # WP returns???????????
+    #    RD.redDotflag2 = False
+    
     for WP in WPList:
         WP.WPflag2 = False
-
+    
+        
+        
+'''        
+    for num, RD in enumerate(RDList):   # loop through RD1, RD2        
+        if RD.redDotflag2 == False: 
+            # RDflag2 set to True when RD clicked
+            screen.blit(RD.RDtransparent,(RD.redDotRect)) 
+'''
+    
 def to_from_BP():
     fromList =[]
     toList = []
@@ -275,11 +288,14 @@ while True:
             
             # for flag 2 activate RD1 or 2 when clicked
             for RD in RDList:
-                if RD.redDotRect.collidepoint(pygame.mouse.get_pos()):
-                    RD.redDotflag2 = True # rearrange pieceList
+                if RD1.redDotRect.collidepoint(pygame.mouse.get_pos()):
+                    RD1.redDotflag2 = True # rearrange pieceList
+                if RD2.redDotRect.collidepoint(pygame.mouse.get_pos()):
+                    RD2.redDotflag2 = True # rearrange pieceList
+                
 
     grid(settings.bg_colour)
-    main(pieceList) # show pieces
+    main() # show pieces
        
     pygame.display.flip()   # updates entire display
     clock.tick(1)   # speed up clock later
