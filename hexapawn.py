@@ -3,6 +3,7 @@ import sys  # to exit
 import settings
 from settings import boardDict
 import random
+import time
 
 pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
@@ -35,6 +36,9 @@ class Pawn:
 #    pawn pos method: input boardDict, num -> return board position (x, y)
     def pos(self, boardDict, num ):
         return boardDict[num]
+    
+    def move(self, boole):
+        return boole
 
 class RedDot:
     """ Need 2 red dots sometimes"""
@@ -43,7 +47,7 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.RDtransparent = pygame.image.load('images/redDotTransparent.png')
         self.redDotRect = self.redDotImg.get_rect()
-        #self.toFromReady = False    # for red dots appearinng
+        self.concealFlag = False    # for red dots appearinng
         self.redDotflag2 = False    # for red dot clicking
 
 fromList = []   # require initialisaton 
@@ -53,12 +57,18 @@ toList = []
 WP1=Pawn() 
 WP2=Pawn()
 WP3=Pawn()
+WPx=Pawn()
 # WP list, will have to modify as game progresses
 WPList =[WP1,WP2,WP3]
 
 #create BP instance, only one needed
 BP = Pawn()
 BP.BPflag = False   # when BPs ready to move make True
+
+# move instances
+print (f"68 WPmove = {WPx.move(True)}")
+print (f"69 BPmove = {BP.move(False)}")
+
 # create red dot instances
 RD1 = RedDot()
 RD2 = RedDot()
@@ -71,11 +81,16 @@ pieceList =[WP1, None ,WP3, None, WP2, None, BP, BP, BP ]
 # main is in the while loop!
 def main(): # list changes to show game progress
     piecesShow()  
-    WP_toFrom() # get to&from lists for this clicked WP
+    if WPx.move(True):  #sets WPx.move to True
+        WP_toFrom() # get to&from lists for this clicked
+    elif BP.move(True):
+        pass
+        # BP to from
     redDots()
     rearrange_pieceList(pieceList)
     #piecesShow(pieceList)  # run the view again
-    turnFlagsOff()  # flags go off before next click!
+    turnFlagsOff()  # WP flag off
+    
     #activate BPs here, correct indentation is a mystery!!!
     #BP.BPflag = True
     # get BP to and from possibilities   
@@ -107,6 +122,12 @@ def piecesShow():
         # black pawns images only           
         if pieceList[key] == BP:
             screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
+    
+    for RD in RDList:
+        if RD.concealFlag == True:        
+            screen.blit(RD.RDtransparent,(RD.redDotRect))  
+            time.sleep(1)
+            #print (125)   
 
 def WP_toFrom():
     for WP in WPList:
@@ -141,6 +162,7 @@ def WP_toFrom():
                             print (f"145 fromList {fromList}")
                             print(f"146 toList {toList}")
         WP.WPflag1 = False   #  prevent to & from lists looping
+    WPx.move(False)
 
 '''
    
@@ -163,6 +185,10 @@ def redDots():
             RD.redDotRect.topleft = (WP.pos(boardDict, toList[num]))
             screen.blit(RD.redDotImg,(RD.redDotRect))
             
+    # RD1.concealFlag = True too early
+    #for RD in RDList:
+    #    print('185')
+    #    screen.blit(RD.RDtransparent,(RD.redDotRect))         
 
 def rearrange_pieceList(pieceList):       
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
@@ -173,18 +199,26 @@ def rearrange_pieceList(pieceList):
             pieceList[toList[0]]=getPawn # move correct WP?
             pieceList[fromList[0]]=getNone  #rearrange pieceList
             RD1.redDotflag2 = False
+            RD1.concealFlag = True
+            
             print(f"184 {pieceList}")
             
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):   #num corresponds to RD1&2
             if RD.redDotflag2 == True:
                 getPawn = pieceList[fromList[num]]
-                getNone = pieceList[toList[num]]
+                #getNone = pieceList[toList[num]]
                 pieceList[toList[num]]=getPawn # move correct WP?
-                pieceList[fromList[num]]=getNone  #rearrange pieceList
+                pieceList[fromList[num]]=None  #rearrange pieceList
+                
+                print(f"215 {RD.concealFlag}")
                 RD.redDotflag2 = False
-                print(f"184 {pieceList}")
-    # transparency not working, function over????????            
+            
+            RD.concealFlag = True
+            # conceal both RDots    
+            print(f"184 {pieceList}")
+    
+            
     
 
     
