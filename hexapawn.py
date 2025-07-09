@@ -31,15 +31,13 @@ class Pawn:
         self.WPSelected = pygame.image.load('images/whitePawnSelected.png')
         self.WPflag1 = False # triggers WP to from lists 
         self.WPflag2 = False # changing WP colour to red
-        self.BPflag = False # triggers BP to from lists and BP move
+        self.BPflag = True
+        self.special = True
 
 #    pawn pos method: input boardDict, num -> return board position (x, y)
     def pos(self, boardDict, num ):
         return boardDict[num]
     
-    def move(self, boole):
-        return boole
-
 class RedDot:
     """ Need 2 red dots sometimes"""
     def __init__(self):
@@ -57,39 +55,92 @@ toList = []
 WP1=Pawn() 
 WP2=Pawn()
 WP3=Pawn()
-WPx=Pawn()
+WPx= Pawn()
+WPx.special = True
+
 # WP list, will have to modify as game progresses
 WPList =[WP1,WP2,WP3]
 
 #create BP instance, only one needed
 BP = Pawn()
-BP.BPflag = False   # when BPs ready to move make True
-
-# move instances
-print (f"68 WPmove = {WPx.move(True)}")
-print (f"69 BPmove = {BP.move(False)}")
+BP.BPflag = True
 
 # create red dot instances
 RD1 = RedDot()
 RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
-
 #pieceList shows pieces on their (initial) board positions
 pieceList =[WP1, None ,WP3, None, WP2, None, BP, BP, BP ]
 
 # main is in the while loop!
 def main(): # list changes to show game progress
-    piecesShow()  
-    if WPx.move(True):  #sets WPx.move to True
-        WP_toFrom() # get to&from lists for this clicked
-    elif BP.move(True):
-        pass
-        # BP to from
-    redDots()
-    rearrange_pieceList(pieceList)
-    #piecesShow(pieceList)  # run the view again
-    turnFlagsOff()  # WP flag off
+    '''
+    moveNum = 2
+    if WPx.special == True:
+        num = 1
+        moveNum = num
+        print(f"80 moveNum {moveNum}")
+        WPx.special = False
+    '''
+    num = 1
+    myflag = 1
+    if num == 1 and myflag == 1:
+        moveNum = num
+    counter = 0  
+    myflag = 2 
+    # problem: it loops back to the main() function
+    # how to loop back to the while loop?
+    
+    print(f"83 moveNum {moveNum}")
+    # toggle WP, BP toFrom lists
+    while True:
+        if moveNum == 1 or moveNum == 3: 
+            
+            print(f"88 white moveNum {moveNum}")
+            piecesShow() 
+            WP_toFrom() # get to&from lists for clicked WP
+            redDots()
+            rearrange_pieceList(pieceList)
+            turnWPflag2Off()
+            
+            moveNum = moveNum + 1
+            counter = counter + 1
+            # it's the other while loop going round and round
+            
+            print(f"105 post white loop moveNum {moveNum}")
+            print (f"counter = {counter}")
+            
+            break
+            
+        if moveNum == 2 or moveNum == 4:
+            print("110 BP go")
+            print(f"105 {BP.BPflag}")
+            BP.BPflag = True
+            if BP.BPflag == True:
+                piecesShow()
+                print("87 black move")
+                print(f"88 preBlackList moveNum {moveNum}")
+                to_from_BP()
+                # move BP and rearrange dictionary
+                moveBP(pieceList, *to_from_BP()) #unpack tuple
+                BP.BPflag = False   # stop BP moving
+                
+                break
+                
+        
+        print(f"95 moveNum = {moveNum}")
+        print(f"94 moveNum {moveNum}")
+        
+            #to_from_BP()
+            #moveBP(pieceList, *to_from_BP()) #unpack tuple
+            #BP.BPflag = False
+            # crashes
+    #print("97 looping")
+    #redDots()
+    #rearrange_pieceList(pieceList)
+    #turnWPflag2Off()  # WPflag2 flag off
+    
     
     #activate BPs here, correct indentation is a mystery!!!
     #BP.BPflag = True
@@ -162,7 +213,9 @@ def WP_toFrom():
                             print (f"145 fromList {fromList}")
                             print(f"146 toList {toList}")
         WP.WPflag1 = False   #  prevent to & from lists looping
-    WPx.move(False)
+    #Wflag =False
+    #Bflag = True
+    
 
 '''
    
@@ -226,10 +279,7 @@ def rearrange_pieceList(pieceList):
 # make newToFrom & To lists for the WP which is clicked
 
 
-def turnFlagsOff():
-    #for RD in RDList:  # WP returns???????????
-    #    RD.redDotflag2 = False
-    
+def turnWPflag2Off():
     for WP in WPList:
         WP.WPflag2 = False
     
@@ -285,6 +335,7 @@ def to_from_BP():
 print(f"225 tuple to_from_BP {to_from_BP()}")
 #rearrage pieceList, move BP
 # NFL & NTL here needed for unpacking of tuple
+
 def moveBP(pieceList, fromList, toList):
     r = random.randint(0, len(fromList)-1)
     pieceList[toList[r]] = BP
@@ -305,8 +356,10 @@ def moveBP(pieceList, fromList, toList):
         if pieceList[key] == WP1 or WP2 or WP3:
             WPList.append(pieceList[key])
             
-                      
-while True:    
+mainWhileCounter = 0                      
+while True:
+    mainWhileCounter = mainWhileCounter + 1 
+    print ( f"357 mainWhileCounter = {mainWhileCounter}")  
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
         if event.type == pygame.QUIT:
@@ -332,7 +385,7 @@ while True:
     main() # show pieces
        
     pygame.display.flip()   # updates entire display
-    clock.tick(1)   # speed up clock later
+    clock.tick(5)   # speed up clock later
     
 
     
