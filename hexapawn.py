@@ -78,37 +78,37 @@ moveNum = 1
 mainCounter = 0
 #WPx.special = False
 # main is in the while loop!
-def main(): # list changes to show game progress
-    global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
-    global mainCounter
-    if moveNum == 1: #and WPx.special == False:
-        print(f"84 moveNum {moveNum}")
-        piecesShow() 
-        WP_toFrom() # get to&from lists for clicked WP
-        redDots()
-        #time.sleep(0)  # pause here, not sleep
-        rearrange_pieceList(pieceList)
-        turnWPflag2Off()
-        # piecesShow()
-        mainCounter +=1
-        print(f"92 mainCounter {mainCounter}")
-        BP.BPflag = True 
-        print(f"95 moveNum {moveNum}")
+def main(moveNum): 
+    if moveNum == 1:
+        WPmove()
+        # wait until finished before incrementing moveNum
+        moveNum += 1
+    #if moveNum == 2:
+        #BPmove()
+    #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
+    #global mainCounter
+
     
-    elif moveNum == 2: #and WPx.special
-        print(f"99 BPflag {BP.BPflag}")
-        BP.BPflag = True    # temporary
-        if BP.BPflag == True:
-            piecesShow()
-            print ("103 black move")
-            print(f"104 preBlackList moveNum {moveNum}")
-            to_from_BP()
-            # move BP and rearrange dictionary
-            moveBP(pieceList, *to_from_BP()) #unpack tuple
-            BP.BPflag = False   # stop BP moving
+def WPmove():       
+    print(f"84 moveNum {moveNum}")
+    piecesShow() 
+    WP_toFrom() # get to&from lists for clicked WP
+    redDots()
+    #time.sleep(0)  # pause here, not sleep
+    rearrange_pieceList(pieceList)
+    turnWPflag2Off()
     
-    moveNum = 1 # later +=1
-    print (f"111 moveNum {moveNum}")
+def BPmove():
+    #time.sleep(5)
+    BP.BPflag = True    # temporary
+    if BP.BPflag == True:
+        piecesShow()
+        print ("103 black move")
+        print(f"104 preBlackList moveNum {moveNum}")
+        to_from_BP()
+        # move BP and rearrange dictionary
+        moveBP(pieceList, *to_from_BP()) #unpack tuple
+        BP.BPflag = False   # stop BP moving
     
 def piecesShow():
     for key, item in enumerate(pieceList):
@@ -296,7 +296,7 @@ while True:
                 
 
     grid(settings.bg_colour)
-    main() # show pieces and more
+    main(moveNum) # show pieces and more
        
     pygame.display.flip()   # updates entire display
     clock.tick(1)   # speed up clock later
