@@ -133,10 +133,12 @@ def piecesShow(): # show WPs and BPs
 def WP_toFrom():
     fromList = []   # otherwise new values are added to old!
     toList = []
+    print (WPList)
     for WP in WPList:
         print (WPList)
-        print (f"137 WP = {WP}") # it thinks I click WP1, whichever WP I click!!!
-        if WP.WPflag1:    # should be true only for the WP rect clicked 
+        print (f"139 WP = {WP}") # it thinks I click WP1, whichever WP I click!!!
+        print(f" 140 WP.WPflag1 {WP.WPflag1}")
+        if WP.WPflag1 == True:    # should be true only for the WP rect clicked 
             print('138 WP1 only????????? YES')
         #Get the pieceList index of the square for the WP which has been clicked
             square = pieceList.index(WP)
@@ -165,9 +167,9 @@ def WP_toFrom():
                         if pieceList[key+4] == BP:  #RH diagonal capture possible
                             fromList.append(square)
                             toList.append(square+4)
-        print (f"166 fromList {fromList}")
-        print(f"167 toList {toList}")
-        return fromList, toList
+    print (f"166 fromList {fromList}")
+    print(f"167 toList {toList}")
+    return fromList, toList
 
 def redDots(fromList, toList):        
     # show clickable red dots on screen in correct positions using to lists
@@ -296,6 +298,7 @@ while True:
                 if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
                     WP.WPflag1 = True # flag for clicked WP to from lists
                     WP.WPflag2 = True # flag for clicked WP colour red
+                    print (f"299 {WP}")
                     
             # for flag 2 activate RD1 or  +=2 when clicked
             for RD in RDList:
