@@ -79,12 +79,16 @@ mainCounter = 0
 #WPx.special = False
 # main is in the while loop!
 def main(moveNum): 
-    if moveNum == 1:
+    global mainCounter
+    if moveNum == 1 or moveNum == 3:
         WPmove()
+        mainCounter += 1
         # wait until finished before incrementing moveNum
+    if mainCounter > 10:
         moveNum += 1
-    #if moveNum == 2:
-        #BPmove()
+        mainCounter = 0
+    if moveNum == 2 or moveNum == 4:
+        BPmove()
     #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
     #global mainCounter
 
@@ -94,13 +98,11 @@ def WPmove():
     piecesShow() 
     WP_toFrom() # get to&from lists for clicked WP
     redDots()
-    #time.sleep(0)  # pause here, not sleep
     rearrange_pieceList(pieceList)
     turnWPflag2Off()
-    
+    BP.BPflag = True
 def BPmove():
-    #time.sleep(5)
-    BP.BPflag = True    # temporary
+    #BP.BPflag = True    # temporary
     if BP.BPflag == True:
         piecesShow()
         print ("103 black move")
@@ -110,7 +112,7 @@ def BPmove():
         moveBP(pieceList, *to_from_BP()) #unpack tuple
         BP.BPflag = False   # stop BP moving
     
-def piecesShow():
+def piecesShow(): # show WPs and BPs
     for key, item in enumerate(pieceList):
         for num, WP in enumerate(WPList):
             if pieceList[key] == WPList[num]:   # find the WPs
@@ -166,7 +168,7 @@ def WP_toFrom():
         WP.WPflag1 = False   #  prevent to & from lists looping
 
 def redDots():        
-    # put clickable red dots on screen in correct positions using to lists
+    # show clickable red dots on screen in correct positions using to lists
     #print(f"93 fromList {fromList}")
     #print(f"toList {toList}")
     # print(f"tuple {WP_toFrom()}")
