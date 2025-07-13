@@ -73,45 +73,63 @@ pieceList =[WP1, None ,WP2, None, WP3, None, BP, BP, BP ]
 
 moveNum = 1
 mainCounter = 0
+click = False
+mytuple =([7],[8])
 
 # main is in the while loop!
 def main(moveNum): 
     global mainCounter
     if moveNum == 1 or moveNum == 3:
-        WPmove()
+        WPmove(moveNum)
         mainCounter += 1
         # wait until finished before incrementing moveNum
-    if mainCounter > 10:
-        moveNum += 1
-        mainCounter = 0
-    if moveNum == 2 or moveNum == 4:
-        BPmove()
+        if mainCounter > 10:
+            moveNum += 1
+            print(f"88 moveNum {moveNum}")
+            mainCounter = 0
+            if moveNum == 2 or moveNum == 4:
+                BPmove(moveNum)
     #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
-    #global mainCounter
     
-def WPmove():       
-    print(f"93 moveNum {moveNum}")
-    piecesShow() 
-    WP_toFrom() # get to&from lists for clicked WP
-    redDots(*WP_toFrom())   # unpack toFrom tuple
-    rearrange_pieceList(pieceList, *WP_toFrom())    # unpack again
-    turnWPflag2Off()
+def WPmove(moveNum):       
+    print(f"94 moveNum {moveNum}")
+    piecesShow(pieceList) 
+    global click
+    global mytuple
+    #print(f"97 before click {click}")
+    if click == True:
+        print (f"99 inside click {click}")
+        #WP_toFrom() # get to&from lists for clicked WP
+        mytuple = WP_toFrom()
+        print(f"103 tuple {mytuple}")
+        click = False
+    #print(f"107 WP_toFrom after click {mytuple}")
+    #print(f"104 after click {click}")
+    # how to run these just once new
+    # only run redDots & rearrange_PL for real fromList values
+    list =[[0],[1],[2],[3],[4],[5],[6], [1,1],[4,4]]
+    if mytuple[0] in list:
+        redDots(pieceList, *mytuple)    
+        rearrange_pieceList(pieceList, *mytuple ) 
+        turnWPflag1Off # good place to turn off(?)
     BP.BPflag = True
-def BPmove():
+
+def BPmove(moveNum):
     #BP.BPflag = True    # temporary
     if BP.BPflag == True:
-        piecesShow()
+        piecesShow(pieceList)
         print ("104 black move")
         print(f"105 preBlackList moveNum {moveNum}")
         to_from_BP()
-        # move BP and rearrange dictionary
+        # move BP and rearrange pieceList
         moveBP(pieceList, *to_from_BP()) #unpack tuple
         #if len(WPList) < 3:
             #WPListUpdate(WPList) # update WPList
             #print ("117 WPList {WPList}")
         BP.BPflag = False   # stop BP moving
+        moveNum += 1
     
-def piecesShow(): # show WPs and BPs
+def piecesShow(pieceList): # show WPs and BPs
     for key, item in enumerate(pieceList):
         for num, WP in enumerate(WPList):
             if pieceList[key] == WPList[num]:   # find the WPs
@@ -126,28 +144,23 @@ def piecesShow(): # show WPs and BPs
         if pieceList[key] == BP:
             screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
     
-    for RD in RDList:
+    for RD in RDList:   # conceal red dots
         if RD.concealFlag == True:        
             screen.blit(RD.RDtransparent,(RD.redDotRect))  
 
 def WP_toFrom():
     fromList = []   # otherwise new values are added to old!
     toList = []
-    print (WPList)
     for WP in WPList:
-        print (WPList)
-        print (f"139 WP = {WP}") # it thinks I click WP1, whichever WP I click!!!
-        print(f" 140 WP.WPflag1 {WP.WPflag1}")
-        if WP.WPflag1 == True:    # should be true only for the WP rect clicked 
-            print('138 WP1 only????????? YES')
+        if WP.WPflag1 == True:    #true only for the WP rect clicked 
         #Get the pieceList index of the square for the WP which has been clicked
             square = pieceList.index(WP)
             # get fromList and toList for this WP
             if pieceList[square + 3] == None:   # nothing in front of this WP
                 fromList.append(square)
                 toList.append(square + 3)
-                print (f"152 fromList {fromList}")
-                print(f"153 toList {toList}")
+                #print (f"152 fromList {fromList}")
+                #print(f"153 toList {toList}")
                 
             for key in range(6):    # check squares 0 to 5 for WP
                 if (key % 3) > 0: 
@@ -167,15 +180,16 @@ def WP_toFrom():
                         if pieceList[key+4] == BP:  #RH diagonal capture possible
                             fromList.append(square)
                             toList.append(square+4)
-    print (f"166 fromList {fromList}")
-    print(f"167 toList {toList}")
+        #WP.WPflag1 = False
+    print (f"164 fromList {fromList}")
+    print(f"165 toList {toList}")
     return fromList, toList
 
-def redDots(fromList, toList):        
+def redDots(pieceList, fromList, toList):      
     # show clickable red dots on screen in correct positions using to lists
-    print(f"172 RD  fromList {fromList}")
-    print(f"173 toList RD {toList}")
-    print(f"174 tuple {WP_toFrom()}")
+    #print(f"172 RD  fromList {fromList}")
+    #print(f"173 toList RD {toList}")
+    #print(f"174 tuple {WP_toFrom()}")
     if len(toList) == 1:
         RD1.redDotRect.topleft = (WP.pos(boardDict, toList[0]))
         screen.blit(RD1.redDotImg,(RD1.redDotRect))
@@ -183,18 +197,20 @@ def redDots(fromList, toList):
         for num, RD in enumerate(RDList):   # loop through RD1, RD2
             RD.redDotRect.topleft = (WP.pos(boardDict, toList[num]))
             screen.blit(RD.redDotImg,(RD.redDotRect))
+    return pieceList
+    # turn WFflag2
+    #turnWPflag1Off()
             
 def rearrange_pieceList(pieceList, fromList, toList):       
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
     if len(toList) == 1: # only one move possible
         if RD1.redDotflag2 == True: # True when RD1 clicked
             getPawn = pieceList[fromList[0]]
-            getNone = pieceList[toList[0]]
+            #getNone = pieceList[toList[0]]
             pieceList[toList[0]]=getPawn # move correct WP?
-            pieceList[fromList[0]]=getNone  #rearrange pieceList
-            RD1.redDotflag2 = False
-            RD1.concealFlag = True
-            
+            pieceList[fromList[0]]=None  # WP has left this square
+            RD1.redDotflag2 = False # disable click
+            RD1.concealFlag = True  # conceal red dots
             
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):   #num corresponds to RD1&2
@@ -209,8 +225,14 @@ def rearrange_pieceList(pieceList, fromList, toList):
             
             RD.concealFlag = True
             # conceal both RDots    
-    print(f"216 after W move {pieceList}")
-  
+    return pieceList
+    #print(f"216 after W move {pieceList}")
+    # turn turflag2 (WPtoFrom activator) after pieces rearranged
+
+def turnWPflag1Off():
+    for WP in WPList:
+        WP.flag1 = False 
+      
 def turnWPflag2Off():
     for WP in WPList:
         WP.WPflag2 = False
@@ -242,7 +264,6 @@ def to_from_BP():
                             fromList.append(num)
                             toList.append(num-4)
                             
-                            
         if key%3 > 0:   # key 0 & 3 False (RH diagonal from black side banned)
             for num in BPList:
                 for WP in WPList:
@@ -251,11 +272,11 @@ def to_from_BP():
                             fromList.append(num)
                             toList.append(num-2)
                             
-    print(f" 260 fromListBP = {fromList}")
-    print(f"261 toListBP = {toList}")
+    print(f" 247 fromListBP = {fromList}")
+    print(f"248 toListBP = {toList}")
     return fromList, toList
     # this tuple is unpacked on line 108 still!
-print(f"254 tuple to_from_BP {to_from_BP()}")
+print(f"251 tuple to_from_BP {to_from_BP()}")
 
 #rearrage pieceList, move random BP
 # FL & TL here needed for unpacking of tuple
@@ -264,8 +285,8 @@ def moveBP(pieceList, fromList, toList):
     pieceList[toList[r]] = BP   # rearrange pieceList
     pieceList[fromList[r]]  = None
     # remake WPList (a WP may have been captured)
-    #print (f" 262 WPList={WPList}")
-    #print (f"263 {pieceList}")
+    #print (f" 260 WPList={WPList}")
+    #print (f"261 {pieceList}")
     return pieceList
 
 # after  BPs move check the WPList still valid
@@ -280,13 +301,10 @@ def WPListUpdate(WPList):
         WPList = newWPList
         return (WPList)
 
-
-            
 mainWhileCounter = 0                      
 while True:
     mainWhileCounter = mainWhileCounter + 1 
-    #print (f"287 moveNum {moveNum}")
-    #print ( f"288 mainWhileCounter = {mainWhileCounter}")  
+    #print ( f"279 mainWhileCounter = {mainWhileCounter}")  
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
         if event.type == pygame.QUIT:
@@ -298,7 +316,7 @@ while True:
                 if WP.WPimgRect.collidepoint(pygame.mouse.get_pos()):
                     WP.WPflag1 = True # flag for clicked WP to from lists
                     WP.WPflag2 = True # flag for clicked WP colour red
-                    print (f"299 {WP}")
+                    click = True
                     
             # for flag 2 activate RD1 or  +=2 when clicked
             for RD in RDList:
@@ -306,7 +324,6 @@ while True:
                     RD1.redDotflag2 = True # rearrange pieceList
                 if RD2.redDotRect.collidepoint(pygame.mouse.get_pos()):
                     RD2.redDotflag2 = True # rearrange pieceList
-                
 
     grid(settings.bg_colour)
     main(moveNum) # show pieces and more
