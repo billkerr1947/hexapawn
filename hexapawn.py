@@ -69,7 +69,7 @@ RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
 #pieceList shows pieces on their (initial) board positions
-pieceList =[WP1, None ,WP2, None, WP3, None, BP, BP, BP ]
+pieceList =[WP1,WP2,WP3, None, None, None, BP, BP, BP ]
 
 moveNum = 1
 mainCounter = 0
@@ -97,19 +97,22 @@ def main(moveNum):
     #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
     
 def WPmove(moveNum):       
-    print(f"94 moveNum {moveNum}")
+    print(f"100 moveNum {moveNum}")
     piecesShow(pieceList) 
     global click
     global mytuple
+    
     if click == True:
-        print (f"99 inside click {click}")
+        print (f"105 inside click {click}")
         #WP_toFrom() # get to&from lists for clicked WP
         mytuple = WP_toFrom()
-        print(f"105 tuple {mytuple}")
+        print(f"108 tuple {mytuple}")
         click = False
+        for WP in WPList:
+            WP.WPflag1 = False
     # only run redDots & rearrange_PL for real fromList values
-    list =[[0],[1],[2],[3],[4],[5],[6], [1,1],[4,4]]
-    if mytuple[0] in list:  # if legitimate move
+    list =[[0],[1],[2],[3],[4],[5],[6],[0,0], [1,1],[2,2],[4,4],[5,5],[3,3]]
+    if mytuple[0] in list:  # if legitimate move fromList
         redDots(pieceList, *mytuple)    
         rearrange_pieceList(pieceList, *mytuple ) 
         piecesShow(pieceList)
@@ -129,6 +132,7 @@ def BPmove(moveNum):
             #print ("117 WPList {WPList}")
         BP.BPflag = False   # stop BP moving
         moveNum += 1
+        print (f"132 moveNum {moveNum}")
     
 def piecesShow(pieceList): # show WPs and BPs
     for RD in RDList:   # conceal red dots
