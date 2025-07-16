@@ -77,11 +77,12 @@ click = False
 mytuple =([7],[8])
 
 # main is in the while loop!
-def main(moveNum): 
+def main(): 
     piecesShow(pieceList)
     global mainCounter
-    if moveNum == 1 or moveNum == 3:
-        WPmove(moveNum)
+    global moveNum
+    if moveNum == 1 or moveNum == 3 or moveNum == 5:
+        WPmove()
         mainCounter += 1
         # wait until finished before incrementing moveNum
         if mainCounter > 5:
@@ -89,15 +90,15 @@ def main(moveNum):
                 WP.WPflag2 = False
         if mainCounter > 10:
             moveNum += 1
-            print(f"88 moveNum {moveNum}")
+            print(f"93 main moveNum {moveNum}")
             mainCounter = 0
             
-            if moveNum == 2 or moveNum == 4:
-                BPmove(moveNum)
+            if moveNum == 2 or moveNum == 4 or moveNum == 6:
+                BPmove()
     #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
     
-def WPmove(moveNum):       
-    print(f"100 moveNum {moveNum}")
+def WPmove():       
+    print(f"100 WPmove moveNum {moveNum}")
     piecesShow(pieceList) 
     global click
     global mytuple
@@ -118,12 +119,13 @@ def WPmove(moveNum):
         piecesShow(pieceList)
         BP.BPflag = True
 
-def BPmove(moveNum):
+def BPmove():
     #BP.BPflag = True    # temporary
     if BP.BPflag == True:
         piecesShow(pieceList)
-        print ("104 black move")
-        print(f"105 preBlackList moveNum {moveNum}")
+        print ("126 black move")
+        global moveNum
+        print(f"127 preBlackList moveNum {moveNum}")
         to_from_BP()
         # move BP and rearrange pieceList
         moveBP(pieceList, *to_from_BP()) #unpack tuple
@@ -132,7 +134,7 @@ def BPmove(moveNum):
             #print ("117 WPList {WPList}")
         BP.BPflag = False   # stop BP moving
         moveNum += 1
-        print (f"132 moveNum {moveNum}")
+        print (f"BP 136 moveNum {moveNum}")
     
 def piecesShow(pieceList): # show WPs and BPs
     for RD in RDList:   # conceal red dots
@@ -320,7 +322,7 @@ while True:
                     RD2.redDotflag2 = True # rearrange pieceList
 
     grid(settings.bg_colour)
-    main(moveNum) # show pieces and more
+    main() # show pieces and more
        
     pygame.display.flip()   # updates entire display
     clock.tick(1)   # speed up clock later
