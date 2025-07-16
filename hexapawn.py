@@ -109,9 +109,13 @@ def WPmove():
         mytuple = WP_toFrom()
         print(f"108 tuple {mytuple}")
         click = False
+        # turn WPflag1 off immediately!
         for WP in WPList:
             WP.WPflag1 = False
+        print(f"115 outside click  tuple {mytuple}")
     # only run redDots & rearrange_PL for real fromList values
+    # problem of ([][]) arriving at redDots() during counter loop
+    # but ([][]) needed for when game is blocked
     list =[[0],[1],[2],[3],[4],[5],[6],[0,0], [1,1],[2,2],[4,4],[5,5],[3,3]]
     if mytuple[0] in list:  # if legitimate move fromList
         redDots(pieceList, *mytuple)    
@@ -157,10 +161,10 @@ def piecesShow(pieceList): # show WPs and BPs
     
     
 def WP_toFrom():
-    fromList = []   # otherwise new values are added to old!
-    toList = []
     for WP in WPList:
         if WP.WPflag1 == True:    #true only for the WP rect clicked 
+            fromList = []   # otherwise new values are added to old!
+            toList = []
         #Get the pieceList index of the square for the WP which has been clicked
             square = pieceList.index(WP)
             # get fromList and toList for this WP
@@ -189,15 +193,15 @@ def WP_toFrom():
                             fromList.append(square)
                             toList.append(square+4)
         #WP.WPflag1 = False
-    print (f"164 fromList {fromList}")
-    print(f"165 toList {toList}")
-    return fromList, toList
+            print (f"196 fromList {fromList}")
+            print(f"197 toList {toList}")
+            return fromList, toList
 
 def redDots(pieceList, fromList, toList):      
     # show clickable red dots on screen in correct positions using to lists
     #print(f"172 RD  fromList {fromList}")
     #print(f"173 toList RD {toList}")
-    #print(f"174 tuple {WP_toFrom()}")
+    print(f"203 RD tuple {WP_toFrom()}")
     if len(toList) == 1:
         RD1.redDotRect.topleft = (WP.pos(boardDict, toList[0]))
         screen.blit(RD1.redDotImg,(RD1.redDotRect))
