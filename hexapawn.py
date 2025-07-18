@@ -72,7 +72,7 @@ RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
 #pieceList shows pieces on their (initial) board positions
-pieceList =[WP1,WP2,WP3, None, None, None, BP, BP, BP ]
+pieceList =[WP1,WP2,WP3, None, None, None, BP, BP, BP, None ]
 
 moveNum = 1
 mainCounter = 0
@@ -84,7 +84,7 @@ def main():
     piecesShow(pieceList)
     global mainCounter
     global moveNum
-    if moveNum == 1 or moveNum == 3 or moveNum == 5:
+    if moveNum == 1 or moveNum == 3 or moveNum == 5 or moveNum == 7:
         WPmove()
         mainCounter += 1
         # wait until finished before incrementing moveNum
@@ -305,17 +305,30 @@ def moveBP(pieceList, fromList, toList):
     r = random.randint(0, len(fromList)-1)
     if fromList[r] - toList[r] == 2 or fromList[r] - toList[r] == 4:
         # find WP that will be captured and move or delete it
-        WP_toMove = pieceList[toList[r]]
+        WP_toMoveSq = toList[r]
+        getWP=pieceList[WP_toMoveSq]    # pick up captured pawn
+        pieceList[9]=getWP  #move captured pawn off the board
+        WP_toMove = pieceList[WP_toMoveSq]
+        print(pieceList)
+        print(f"311 WP_toMoveSq {WP_toMoveSq}")
         print (f"309 BPmove WP_toMove {WP_toMove}")
     pieceList[toList[r]] = BP   # rearrange pieceList
     pieceList[fromList[r]]  = None
     print(f"305 BP fromList[r] {fromList[r]}")
     print(f"306 BP toList[r] {toList[r]}")
-    return (pieceList, WP_toMove)
+    return (pieceList)
     # remake WPList (a WP may have been captured)
     #print (f" 260 WPList={WPList}")
     #print (f"261 {pieceList}")
     #return pieceList
+
+def moveCapturedWP(pieceList, WP_toMoveSq, WP_toMove):
+    # move captured WP to boardDict pos 11
+    # pieces_show shows how?
+    pass
+     
+    
+    
 
 #print (f"315 tuple {moveBP(pieceList, *WP_toFrom())}" )
 # after  BPs move check the WPList still valid
