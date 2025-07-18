@@ -127,7 +127,7 @@ def WPmove():
     # but ([][]) needed for when game is blocked
     list =[[0],[1],[2],[3],[4],[5],[6],[0,0], [1,1],[2,2],[4,4],[5,5],[3,3]]
     if mytuple[0] in list:  # if legitimate move fromList
-        redDots(pieceList, *mytuple) 
+        redDots(*mytuple) 
         print(f"127 clickWP {clickWP}")
         print(f"122 after RDot move {moveNum}")   
         rearrange_pieceList(pieceList, *mytuple ) 
@@ -212,7 +212,7 @@ def WP_toFrom():
             print(f"197 toList {toList}")
             return fromList, toList
 
-def redDots(pieceList, fromList, toList):      
+def redDots(fromList, toList):      
     # show clickable red dots on screen in correct positions using to lists
     #print(f"172 RD  fromList {fromList}")
     #print(f"173 toList RD {toList}")
@@ -225,7 +225,7 @@ def redDots(pieceList, fromList, toList):
             RD.redDotRect.topleft = (WP.pos(boardDict, toList[num]))
             screen.blit(RD.redDotImg,(RD.redDotRect))
     print ("223 red dots completed")
-    return pieceList
+    #return pieceList
                 
 def rearrange_pieceList(pieceList, fromList, toList):       
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
@@ -303,17 +303,19 @@ def to_from_BP():
 # FL & TL here needed for unpacking of tuple
 def moveBP(pieceList, fromList, toList):
     r = random.randint(0, len(fromList)-1)
+    if fromList[r] - toList[r] == 2 or fromList[r] - toList[r] == 4:
+        # find WP that will be captured and move or delete it
+        WP_toMove = pieceList[toList[r]]
+        print (f"309 BPmove WP_toMove {WP_toMove}")
     pieceList[toList[r]] = BP   # rearrange pieceList
     pieceList[fromList[r]]  = None
     print(f"305 BP fromList[r] {fromList[r]}")
     print(f"306 BP toList[r] {toList[r]}")
-    if fromList[r] - toList[r] == 2 or fromList[r] - toList[r] == 4:
-        capSquare = toList[r]
-        print(f"CAPTURE on square {capSquare}")
+    return (pieceList, WP_toMove)
     # remake WPList (a WP may have been captured)
     #print (f" 260 WPList={WPList}")
     #print (f"261 {pieceList}")
-    return pieceList
+    #return pieceList
 
 #print (f"315 tuple {moveBP(pieceList, *WP_toFrom())}" )
 # after  BPs move check the WPList still valid
