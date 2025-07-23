@@ -154,6 +154,7 @@ def WPmove():
         rearrange_pieceList(pieceList, *mytuple ) 
         piecesShow(pieceList)
     
+    
     BP.BPflag = True
 
 def BPmove():
@@ -200,28 +201,29 @@ def WP_toFrom():
             toList = []
         #Get the pieceList index of the square for the WP which has been clicked
             square = pieceList.index(WP)
-            # get fromList and toList for this WP
-            if pieceList[square + 3] == None:   # nothing in front of this WP
-                fromList.append(square)
-                toList.append(square + 3)
-                
-            for key in range(6):    # check squares 0 to 5 for WP
-                if (key % 3) > 0: 
-                    # False for squares 0 & 3 (LH column), True for midddle & RH column
-                    # WP can't capture diagonally to left from these squares
-                    if square == key:   #get key for this WP
-                        if pieceList[key+2] == BP:  # LH diagonal capture possible
-                            fromList.append(square)
-                            toList.append(square+2)
-                            
-                if (key % 3) < 2: 
-                    if square == (key):
-                    #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
-                    # WP can't capture diagonally to right from these squares
-                        if pieceList[key+4] == BP:  #RH diagonal capture possible
-                            fromList.append(square)
-                            toList.append(square+4)
-        
+            if square < 9:
+                # get fromList and toList for this WP
+                if pieceList[square + 3] == None:   # nothing in front of this WP
+                    fromList.append(square)
+                    toList.append(square + 3)
+                    
+                for key in range(6):    # check squares 0 to 5 for WP
+                    if (key % 3) > 0: 
+                        # False for squares 0 & 3 (LH column), True for midddle & RH column
+                        # WP can't capture diagonally to left from these squares
+                        if square == key:   #get key for this WP
+                            if pieceList[key+2] == BP:  # LH diagonal capture possible
+                                fromList.append(square)
+                                toList.append(square+2)
+                                
+                    if (key % 3) < 2: 
+                        if square == (key):
+                        #False for squares 2 & 5, True for squares 0,1,3,4 LH & middle columns
+                        # WP can't capture diagonally to right from these squares
+                            if pieceList[key+4] == BP:  #RH diagonal capture possible
+                                fromList.append(square)
+                                toList.append(square+4)
+            
             print (f"209 fromList exit {fromList}")
             print(f"210 toList exit {toList}")
             return fromList, toList
@@ -234,6 +236,7 @@ def blockCheck():
         for squares, WP in enumerate(pieceList):
             for num, WP in enumerate(WPList):
                 #Get the  squares for each WP
+                
                 if pieceList[squares] == WPList[num]:
                     if squares < 9:
                         if pieceList[squares + 3] == None:   # move forward possible
@@ -242,14 +245,14 @@ def blockCheck():
                             if key % 3 < 2: #False for keys 2 and 5
                                             # True for keys 0, 1, 3 and 4
                                 if squares == key:
-                                    if pieceList[squares + 4] == 'BP':  # capture possible
+                                    if pieceList[squares + 4] == BP:  # capture possible
                                         fromBlockList.append(squares)
                             if (key % 3) > 0:  
                                 if squares == key:  
-                                    if pieceList[squares + 2] == 'BP':  # capture possible
+                                    if pieceList[squares + 2] == BP:  # capture possible
                                         fromBlockList.append(squares)
                                     # if fromBlocklist =[] then white can't move
-        print(f"241 fromBlockList {fromBlockList}")
+        print(f"255 fromBlockList {fromBlockList}")                              
         return fromBlockList
 
 def redDots(fromList, toList):      
@@ -268,7 +271,8 @@ def redDots(fromList, toList):
     #print ("258 red dots completed")
     #return pieceList
                 
-def rearrange_pieceList(pieceList, fromList, toList):       
+def rearrange_pieceList(pieceList, fromList, toList):     
+    global W_wins  
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
     print(f"262 rearrange tuple {WP_toFrom()}")
     if len(toList) == 1: # only one move possible
@@ -280,6 +284,11 @@ def rearrange_pieceList(pieceList, fromList, toList):
             pieceList[toList[0]]=getPawn # move correct WP
             pieceList[fromList[0]]=None  # WP has left this square
             print(f"272 WP one option start {start}, end {end}")
+            if end == 6 or end == 7  or end == 8:
+                print("white wins reaches third row")
+                W_wins += 1
+                print(f"288 W_wins  {W_wins}")
+                sys.exit(0)
             RD1.redDotflag2 = False # disable click
             RD1.concealFlag = True  # conceal red dots
             
@@ -296,6 +305,11 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 pieceList[fromList[num]]=None  #rearrange pieceList
                 #print(f"201 {RD.concealFlag}")
                 print(f"287 WP two options start {start}, end {end}")
+                if end == 6 or end == 7  or end == 8:
+                    print("white wins reaches third row")
+                    W_wins += 1
+                    print(f"310 W_wins  {W_wins}")
+                    sys.exit(0)
                 RD.redDotflag2 = False
                 
                 for RD in RDList:
@@ -353,18 +367,26 @@ def moveBP(pieceList, fromList, toList):
         sys.exit(0)
         # how to stop here?
     r = random.randint(0, len(fromList)-1)
-    WP_fromSq = fromList[r]
-    WP_toMoveSq = toList[r]
+    BP_fromSq = fromList[r]
+    BP_toMoveSq = toList[r]
     difference = fromList[r] - toList[r]
-    print(f"346 black move from = {WP_fromSq}, to = {WP_toMoveSq}") 
+    print(f"346 black move from = {BP_fromSq}, to = {BP_toMoveSq}") 
     
     if difference == 2 or difference == 4:
         # find WP that will be captured and move or delete it
-        getWP=pieceList[WP_toMoveSq]    # pick up captured pawn
+        getWP=pieceList[BP_toMoveSq]    # pick up captured pawn
         pieceList[9]=getWP  #move captured pawn off the board
        
-    pieceList[toList[r]] = BP   # rearrange pieceList
-    pieceList[fromList[r]]  = None
+    pieceList[BP_toMoveSq] = BP   # rearrange pieceList
+    pieceList[BP_fromSq]  = None
+    
+    if BP_toMoveSq == 0 or BP_toMoveSq == 1 or BP_toMoveSq == 2:
+        print ("black reaches row 1 wins")
+        B_wins += 1
+        print(B_wins)
+        sys.exit(0)
+    
+    
     return (pieceList)
 
 # after  BPs move check the WPList still valid
