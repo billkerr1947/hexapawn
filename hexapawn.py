@@ -35,6 +35,7 @@ class Pawn:
         self.WPflag1 = False # triggers WP to from lists 
         self.WPflag2 = False # changing WP colour to red
         self.BPflag = True
+        
         self.special = True
 
 #    pawn pos method: input boardDict, num -> return board position (x, y)
@@ -81,13 +82,15 @@ moveNum = 1
 mainCounter = 0
 clickWP = False
 mytuple =([7],[8])  # arbitrary starting values
+W_wins = 0
+B_wins = 0
 
 # main is in the while loop!
 def main(): 
     piecesShow(pieceList)
     global mainCounter
     global moveNum
-    if moveNum == 1 or moveNum == 3 or moveNum == 5 or moveNum == 7:
+    if moveNum == 1 or moveNum == 3 or moveNum == 5 or moveNum == 7 or moveNum == 9:
         WPmove()
         mainCounter += 1
         # make some time for pawn click before incrementing moveNum
@@ -96,10 +99,10 @@ def main():
                 WP.WPflag2 = False
         if mainCounter > 7:
             moveNum += 1
-            print(f"93 main moveNum {moveNum}")
+            print(f"99 main moveNum {moveNum}")
             mainCounter = 0
             
-            if moveNum == 2 or moveNum == 4 or moveNum == 6:
+            if moveNum == 2 or moveNum == 4 or moveNum == 6 or moveNum == 8:
                 BPmove()
     #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
     
@@ -108,35 +111,50 @@ def WPmove():
     piecesShow(pieceList) 
     global clickWP
     global mytuple
+    global blockChecker
+    global W_wins
+    global B_wins
     
+    blockChecker = True
+    if blockChecker == True:
+        #print(f"116 pieceList {pieceList}")
+        if blockCheck() == []:
+            print(f"116 blockCheck() {blockCheck()}")
+            print ("116 white blocked. black wins")
+            B_wins += 1
+            print(f"125 B_wins {B_wins}")
+            blockChecker = False
+            sys.exit(0)
+            # how to stop here?
     if clickWP == True:
         # if RD on same square as WP then deactivate RDflag2 for now
         for RD in RDList:
             if RD.redDotflag2 == True:
                 RD.redDotflag2 = False
-        print (f"107 inside click {clickWP}")
+        print (f"124 inside click {clickWP}")
         #WP_toFrom() # get to&from lists for clicked WP
-        #print(f"109 inside click WP.WPflag1 {WP.WPflag1}")
-        print(f"116 before call old tuple {mytuple}")
+        #print(f"120 before call old tuple {mytuple}")
         mytuple = WP_toFrom()
-        print(f"118 new tuple {mytuple}")
+        #print(f"128 new tuple {mytuple}")
         
         clickWP = False
         # turn WPflag1 off immediately!
         for WP in WPList:
             WP.WPflag1 = False
-        print(f"115 outside click  tuple {mytuple}")
+        #print(f"127 outside click  tuple {mytuple}")
     # only run redDots & rearrange_PL for real fromList values
     # 
     # but ([][]) needed for when game is blocked
+    print(f"138 mytuple white {mytuple}")
     list =[[0],[1],[2],[3],[4],[5],[6],[0,0], [1,1],[2,2],[4,4],[5,5],[3,3]]
     if mytuple[0] in list:  # if legitimate move fromList
         redDots(*mytuple) # red dots appear
-        print(f"132 after RDot move {moveNum}") 
+        #print(f"143 after RDot move {moveNum}") 
         
         rearrange_pieceList(pieceList, *mytuple ) 
         piecesShow(pieceList)
-        BP.BPflag = True
+    
+    BP.BPflag = True
 
 def BPmove():
     #BP.BPflag = True    # temporary
@@ -175,7 +193,7 @@ def piecesShow(pieceList): # show WPs and BPs
             screen.blit(BP.BPimg,(BP.pos(boardDict, key)))
     
 def WP_toFrom():
-    print("180 visiting WPTF")
+    #print("180 visiting WPTF")
     for WP in WPList:
         if WP.WPflag1 == True:    #true only for the WP rect clicked 
             fromList = []   # otherwise new values are added to old!
@@ -208,6 +226,32 @@ def WP_toFrom():
             print(f"210 toList exit {toList}")
             return fromList, toList
 
+def blockCheck():
+    if blockChecker == True:
+        fromBlockList = []   # otherwise new values are added to old!
+                #toBlockList = []
+        #sqList = [] 
+        for squares, WP in enumerate(pieceList):
+            for num, WP in enumerate(WPList):
+                #Get the  squares for each WP
+                if pieceList[squares] == WPList[num]:
+                    if squares < 9:
+                        if pieceList[squares + 3] == None:   # move forward possible
+                            fromBlockList.append(squares)
+                        for key in range(6):
+                            if key % 3 < 2: #False for keys 2 and 5
+                                            # True for keys 0, 1, 3 and 4
+                                if squares == key:
+                                    if pieceList[squares + 4] == 'BP':  # capture possible
+                                        fromBlockList.append(squares)
+                            if (key % 3) > 0:  
+                                if squares == key:  
+                                    if pieceList[squares + 2] == 'BP':  # capture possible
+                                        fromBlockList.append(squares)
+                                    # if fromBlocklist =[] then white can't move
+        print(f"241 fromBlockList {fromBlockList}")
+        return fromBlockList
+
 def redDots(fromList, toList):      
     # show clickable red dots on screen in correct positions using to lists
     #print(f"215 RDots start  fromList {fromList}")
@@ -221,24 +265,29 @@ def redDots(fromList, toList):
         for num, RD in enumerate(RDList):   # loop through RD1, RD2
             RD.redDotRect.topleft = (RD.pos(boardDict, toList[num]))
             screen.blit(RD.redDotImg,(RD.redDotRect))
-    print ("234 red dots completed")
+    #print ("258 red dots completed")
     #return pieceList
                 
 def rearrange_pieceList(pieceList, fromList, toList):       
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
-    print(f"239 rearrange tuple {WP_toFrom()}")
+    print(f"262 rearrange tuple {WP_toFrom()}")
     if len(toList) == 1: # only one move possible
         if RD1.redDotflag2 == True: # True when RD1 clicked
+            start = fromList[0]
+            end = toList[0]
             getPawn = pieceList[fromList[0]]
             #getNone = pieceList[toList[0]]
             pieceList[toList[0]]=getPawn # move correct WP
             pieceList[fromList[0]]=None  # WP has left this square
+            print(f"272 WP one option start {start}, end {end}")
             RD1.redDotflag2 = False # disable click
             RD1.concealFlag = True  # conceal red dots
             
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):
             if RD.redDotflag2 == True:
+                start = fromList[num]
+                end = toList[num]
                 fromListNum = fromList[num] 
                 toListNum = toList[num]
                 getPawn = pieceList[fromListNum]
@@ -246,6 +295,7 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 pieceList[toList[num]]=getPawn # move correct WP
                 pieceList[fromList[num]]=None  #rearrange pieceList
                 #print(f"201 {RD.concealFlag}")
+                print(f"287 WP two options start {start}, end {end}")
                 RD.redDotflag2 = False
                 
                 for RD in RDList:
@@ -288,20 +338,31 @@ def to_from_BP():
                             fromList.append(num)
                             toList.append(num-2)
                             
-    print(f" 298 fromListBP = {fromList}")
-    print(f"299 toListBP = {toList}")
+    print(f" 291 fromListBP = {fromList}")
+    print(f"292 toListBP = {toList}")
     return fromList, toList
     # this tuple is unpacked on line 157 (at the moment!)
 
 #rearrage pieceList, move random BP
 # FL & TL here needed for unpacking of tuple
 def moveBP(pieceList, fromList, toList):
+    if len(fromList) == 0:
+        print("340 black blocked, white wins") # working
+        W_wins +=1
+        print (f"351 W_wins {W_wins}")
+        sys.exit(0)
+        # how to stop here?
     r = random.randint(0, len(fromList)-1)
-    if (fromList[r] - toList[r]) == 2 or (fromList[r] - toList[r]) == 4:
+    WP_fromSq = fromList[r]
+    WP_toMoveSq = toList[r]
+    difference = fromList[r] - toList[r]
+    print(f"346 black move from = {WP_fromSq}, to = {WP_toMoveSq}") 
+    
+    if difference == 2 or difference == 4:
         # find WP that will be captured and move or delete it
-        WP_toMoveSq = toList[r]
         getWP=pieceList[WP_toMoveSq]    # pick up captured pawn
         pieceList[9]=getWP  #move captured pawn off the board
+       
     pieceList[toList[r]] = BP   # rearrange pieceList
     pieceList[fromList[r]]  = None
     return (pieceList)
@@ -342,8 +403,8 @@ while True:
                     RD1.redDotflag2 = True # rearrange pieceList
                 if RD2.redDotRect.collidepoint(pygame.mouse.get_pos()):
                     RD2.redDotflag2 = True # rearrange pieceList
-                print(f"362 RD1 clicked here {RD1.redDotflag2}" )
-                print(f"363 RD2 clicked here {RD2.redDotflag2}" )
+                #print(f"362 RD1 clicked here {RD1.redDotflag2}" )
+                #print(f"363 RD2 clicked here {RD2.redDotflag2}" )
 
     grid(settings.bg_colour)
     main() # show pieces and more
