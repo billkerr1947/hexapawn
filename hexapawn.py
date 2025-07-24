@@ -76,7 +76,7 @@ RD2 = RedDot()
 RDList = [RD1, RD2] #permanent (immutable, ha)
 
 #pieceList shows pieces on their (initial) board positions
-pieceList =[WP1,WP2,WP3, None, None, None, BP, BP, BP, None ]
+pieceList =[WP1,WP2,WP3, None, None, None, BP, BP, BP, None, None, None ]
 
 moveNum = 1
 mainCounter = 0
@@ -90,7 +90,7 @@ def main():
     piecesShow(pieceList)
     global mainCounter
     global moveNum
-    if moveNum == 1 or moveNum == 3 or moveNum == 5 or moveNum == 7 or moveNum == 9:
+    if moveNum % 2 == 1: # odd number
         WPmove()
         mainCounter += 1
         # make some time for pawn click before incrementing moveNum
@@ -102,7 +102,7 @@ def main():
             print(f"99 main moveNum {moveNum}")
             mainCounter = 0
             
-            if moveNum == 2 or moveNum == 4 or moveNum == 6 or moveNum == 8:
+            if moveNum % 2 == 0:
                 BPmove()
     #global moveNum  # WP moves odd 1 & 3, BP moves even 2 & 4
     
@@ -124,28 +124,21 @@ def WPmove():
             B_wins += 1
             print(f"125 B_wins {B_wins}")
             blockChecker = False
-            sys.exit(0)
-            # how to stop here?
+            sys.exit(0) #exit
     if clickWP == True:
         # if RD on same square as WP then deactivate RDflag2 for now
         for RD in RDList:
             if RD.redDotflag2 == True:
                 RD.redDotflag2 = False
         print (f"124 inside click {clickWP}")
-        #WP_toFrom() # get to&from lists for clicked WP
-        #print(f"120 before call old tuple {mytuple}")
         mytuple = WP_toFrom()
-        #print(f"128 new tuple {mytuple}")
-        
         clickWP = False
         # turn WPflag1 off immediately!
         for WP in WPList:
             WP.WPflag1 = False
-        #print(f"127 outside click  tuple {mytuple}")
     # only run redDots & rearrange_PL for real fromList values
-    # 
-    # but ([][]) needed for when game is blocked
-    print(f"138 mytuple white {mytuple}")
+    print(f"130 mytuple white {mytuple}")
+    # list necessary?
     list =[[0],[1],[2],[3],[4],[5],[6],[0,0], [1,1],[2,2],[4,4],[5,5],[3,3]]
     if mytuple[0] in list:  # if legitimate move fromList
         redDots(*mytuple) # red dots appear
@@ -360,6 +353,8 @@ def to_from_BP():
 #rearrage pieceList, move random BP
 # FL & TL here needed for unpacking of tuple
 def moveBP(pieceList, fromList, toList):
+    global B_wins
+    global W_wins
     if len(fromList) == 0:
         print("340 black blocked, white wins") # working
         W_wins +=1
@@ -375,7 +370,16 @@ def moveBP(pieceList, fromList, toList):
     if difference == 2 or difference == 4:
         # find WP that will be captured and move or delete it
         getWP=pieceList[BP_toMoveSq]    # pick up captured pawn
-        pieceList[9]=getWP  #move captured pawn off the board
+        if pieceList[9] == None:
+            pieceList[9]=getWP  #move captured pawn off the board
+        elif pieceList[9] != None and pieceList[10] == None:
+            pieceList[10] = getWP
+        elif pieceList[9] != None and pieceList[10] != None:
+            pieceList[11] = getWP
+            print("all white pawns captured, black wins")
+            B_wins +=1
+            print(f"381 B_wins {B_wins}")
+            sys.exit(0)
        
     pieceList[BP_toMoveSq] = BP   # rearrange pieceList
     pieceList[BP_fromSq]  = None
@@ -383,7 +387,7 @@ def moveBP(pieceList, fromList, toList):
     if BP_toMoveSq == 0 or BP_toMoveSq == 1 or BP_toMoveSq == 2:
         print ("black reaches row 1 wins")
         B_wins += 1
-        print(B_wins)
+        print(f"390 B_wins {B_wins}")
         sys.exit(0)
     
     
@@ -409,7 +413,9 @@ while True:
     for event in pygame.event.get():
         # any keyboard or mouse event will activate this loop
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
+            #pygame.display.update()
             
         if event.type == pygame.MOUSEBUTTONDOWN:
             for WP in WPList:
