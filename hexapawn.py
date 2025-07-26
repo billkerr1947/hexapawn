@@ -14,13 +14,13 @@ clock = pygame.time.Clock() # create a clock
 def grid(bgcolour):
     screen.fill(bgcolour)  #bg colour screen
     # draw line grid on screen (must be in while loop)
-    pygame.draw.line(screen,"red",start_pos=(150,0),end_pos=(150,450))
-    pygame.draw.line(screen,"red",start_pos=(300,0),end_pos=(300,450))
-    pygame.draw.line(screen,"red",start_pos=(450,0),end_pos=(450,450))
-    pygame.draw.line(screen,"red",start_pos=(600,0),end_pos=(600,450))
+    pygame.draw.line(screen,"black",start_pos=(150,0),end_pos=(150,450), width = 5)
+    pygame.draw.line(screen,"black",start_pos=(300,0),end_pos=(300,450))
+    pygame.draw.line(screen,"black",start_pos=(450,0),end_pos=(450,450))
+    pygame.draw.line(screen,"black",start_pos=(600,0),end_pos=(600,450), width = 5)
     
-    pygame.draw.line(screen,"red",start_pos=(0,150),end_pos=(750,150))
-    pygame.draw.line(screen,"red",start_pos=(0,300),end_pos=(750,300))
+    pygame.draw.line(screen,"black",start_pos=(0,150),end_pos=(750,150))
+    pygame.draw.line(screen,"black",start_pos=(0,300),end_pos=(750,300))
 
 class Pawn:
     """make a class since want 3 white pawn instances"""
