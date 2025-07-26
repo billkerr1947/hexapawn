@@ -49,7 +49,7 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         self.RDtransparent = pygame.image.load('images/redDotTransparent.png')
         self.redDotRect = self.redDotImg.get_rect()
-        self.concealFlag = False    # for red dots appearinng
+        #self.concealFlag = False    # for red dots appearinng
         self.redDotflag2 = False    # for red dot clicking
     
     def pos(self, boardDict, num ): # reposition red dots sometimes
@@ -168,9 +168,9 @@ def BPmove():
         moveNum += 1
     
 def piecesShow(pieceList): # show WPs and BPs
-    for RD in RDList:   # conceal red dots
-        if RD.concealFlag == True:        
-            screen.blit(RD.RDtransparent,(RD.redDotRect))  
+    #for RD in RDList:   # conceal red dots
+    #    if RD.concealFlag == True:        
+    #        screen.blit(RD.RDtransparent,(RD.redDotRect))  
 
     for key, item in enumerate(pieceList):
         for num, WP in enumerate(WPList):
@@ -283,7 +283,7 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 print(f"288 W_wins  {W_wins}")
                 sys.exit(0)
             RD1.redDotflag2 = False # disable click
-            RD1.concealFlag = True  # conceal red dots
+            #RD1.concealFlag = True  # conceal red dots
             
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):
@@ -305,8 +305,8 @@ def rearrange_pieceList(pieceList, fromList, toList):
                     sys.exit(0)
                 RD.redDotflag2 = False
                 
-                for RD in RDList:
-                    RD.concealFlag = True
+            #    for RD in RDList:
+            #        RD.concealFlag = True
             # conceal both RDots 
     print ("266 rearrange completed")  
     return pieceList
