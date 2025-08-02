@@ -100,10 +100,12 @@ def main():
         # moveNum incremented in pieces_rearrange
         # otherwise black move happens before white move completed
         if moveNum % 2 == 0:    # even number 2, 4 etc
+            # delay black move by a few cycles
+            print(f"104 BPmove {moveNum}")
             mainCounter += 1
             if mainCounter > 3:
                 BPmove()
-                if gameOver:
+                if gameOver:   # necessary?
                     sys.exit(0)
                 mainCounter = 0
             
@@ -146,6 +148,7 @@ def WPmove():
         
         rearrange_pieceList(pieceList, *mytuple ) 
         #print("136 pieces rearranged done")
+    
         piecesShow(pieceList)
     BP.BPflag = True
 
@@ -259,7 +262,9 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 gameOver = True
             RD1.redDotflag2 = False # disable click immediately!!
             moveNum += 1 # wait for white move to finish before black move
-            
+            # make all WPs white
+            for WP in WPList:
+                WP.WPflag2 = False
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):
             if RD.redDotflag2 == True:
@@ -275,7 +280,10 @@ def rearrange_pieceList(pieceList, fromList, toList):
                     gameOver = True
                 RD.redDotflag2 = False # disable click immediately!!
                 moveNum += 1 # wait for white move to finish before black move
-    return pieceList
+                # make all WPs white
+                for WP in WPList:
+                    WP.WPflag2 = False
+                return pieceList
 
 # make BP to & from lists    
 def to_from_BP():
@@ -318,10 +326,12 @@ def moveBP(pieceList, fromList, toList):
     global W_wins
     global gameOver
     if len(fromList) == 0:
-        print("302 black blocked, white wins")
+        print("322 black blocked, white wins")
         W_wins +=1
-        print (f"304 W_wins {W_wins}")
+        print (f"324 W_wins {W_wins}")
         gameOver = True
+        if gameOver:
+            sys.exit(0)
     # move random possible black pawn    
     r = random.randint(0, len(fromList)-1)
     BP_fromSq = fromList[r]
