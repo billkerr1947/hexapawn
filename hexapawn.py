@@ -83,23 +83,18 @@ B_wins = 0
 
 # main is in the while loop!
 def main(): 
-    piecesShow(pieceList)
-    global mainCounter
-    global moveNum
-    if moveNum % 2 == 1: # odd number 1, 3 etc
-        WPmove()
-        mainCounter += 1
-        # make some time for pawn click before incrementing moveNum
-        if mainCounter > 4:
-            for WP in WPList:
-                WP.WPflag2 = False  #from red to white
-        if mainCounter > 7:
-            moveNum += 1
-            print(f"99 main moveNum {moveNum}")
-            mainCounter = 0
+    whiteMove = True
+    while whiteMove:
+        piecesShow(pieceList)
+        global moveNum
+        if moveNum % 2 == 1: # odd number 1, 3 etc
+            WPmove()
+        whiteMove = False
+        # moveNum incremented in pieces_rearrange
+        # otherwise black move happens before white move completed
+        if moveNum % 2 == 0:    # even number 2, 4 etc
+            BPmove()
             
-            if moveNum % 2 == 0:    # even number 2, 4 etc
-                BPmove()
     
 def WPmove():       
     print(f"107 WPmove moveNum {moveNum}")
@@ -123,22 +118,26 @@ def WPmove():
             if RD.redDotflag2 == True:
                 RD.redDotflag2 = False
         mytuple = WP_toFrom()   # got WP toFrom values
+        print(f"124 new tuple {mytuple}")
         clickWP = False
         # turn WPflag1 off immediately!
         for WP in WPList:
             WP.WPflag1 = False
     # only run redDots & rearrange_PL for real fromList values
-    print(f"130 mytuple white {mytuple}")
+    #print(f"130 mytuple white {mytuple}")
     # list necessary?
     list =[[0],[1],[2],[3],[4],[5],[6],[0,0], [1,1],[2,2],[4,4],[5,5],[3,3]]
     if mytuple[0] in list:  # if legitimate move fromList
         redDots(*mytuple) # red dots appear
+        
         rearrange_pieceList(pieceList, *mytuple ) 
+        #print("136 pieces rearranged done")
         piecesShow(pieceList)
     BP.BPflag = True
 
 def BPmove():
     if BP.BPflag == True:
+        
         piecesShow(pieceList)
         global moveNum
         # get BP toFrm values and move BP (randomly for now) & rearrange pieceList
@@ -229,6 +228,7 @@ def redDots(fromList, toList):
                 
 def rearrange_pieceList(pieceList, fromList, toList):     
     global W_wins  
+    global moveNum
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
     if len(toList) == 1: # only one move possible
         if RD1.redDotflag2 == True: # True when RD1 clicked
@@ -242,7 +242,8 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 W_wins += 1
                 print(f"243 W_wins  {W_wins}")
                 sys.exit(0)
-            RD1.redDotflag2 = False # disable click
+            RD1.redDotflag2 = False # disable click immediately!!
+            moveNum += 1 # wait for white move to finish before black move
             
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):
@@ -257,7 +258,8 @@ def rearrange_pieceList(pieceList, fromList, toList):
                     W_wins += 1
                     print(f"258 W_wins  {W_wins}")
                     sys.exit(0)
-                RD.redDotflag2 = False # no longer clickable
+                RD.redDotflag2 = False # disable click immediately!!
+                moveNum += 1 # wait for white move to finish before black move
     return pieceList
 
 # make BP to & from lists    
@@ -296,6 +298,7 @@ def to_from_BP():
 #rearrage pieceList, move random BP
 # FL & TL here needed for unpacking of tuple
 def moveBP(pieceList, fromList, toList):
+    # time.sleep(5)
     global B_wins
     global W_wins
     if len(fromList) == 0:
