@@ -80,38 +80,52 @@ clickWP = False
 mytuple =([7],[8])  # arbitrary starting values
 W_wins = 0
 B_wins = 0
+gameOver = False
 
 # main is in the while loop!
 def main(): 
+    global mainCounter
+    print (f"88 mainCounter gameOver check {mainCounter}")
+    print(f"89 gameOver {gameOver}")
+    if gameOver == True:
+        sys.exit(0)
     whiteMove = True
     while whiteMove:
         piecesShow(pieceList)
         global moveNum
         if moveNum % 2 == 1: # odd number 1, 3 etc
             WPmove()
+            
         whiteMove = False
         # moveNum incremented in pieces_rearrange
         # otherwise black move happens before white move completed
         if moveNum % 2 == 0:    # even number 2, 4 etc
-            BPmove()
+            mainCounter += 1
+            if mainCounter > 3:
+                BPmove()
+                if gameOver:
+                    sys.exit(0)
+                mainCounter = 0
             
     
 def WPmove():       
-    print(f"107 WPmove moveNum {moveNum}")
+    print(f"111 WPmove moveNum {moveNum}")
     piecesShow(pieceList) 
     global clickWP
     global mytuple
     global blockChecker
     global W_wins
     global B_wins
+    global gameOver
     
     blockChecker = True
     if blockChecker == True:
         if blockCheck() == []:
             B_wins += 1
             print(f"117 white blocked so B_wins {B_wins}")
+            gameOver = True 
             blockChecker = False
-            sys.exit(0) #exit
+            
     if clickWP == True:
         # if RD on same square as WP then deactivate RDflag2 for now
         for RD in RDList:
@@ -229,6 +243,7 @@ def redDots(fromList, toList):
 def rearrange_pieceList(pieceList, fromList, toList):     
     global W_wins  
     global moveNum
+    global  gameOver
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
     if len(toList) == 1: # only one move possible
         if RD1.redDotflag2 == True: # True when RD1 clicked
@@ -238,10 +253,10 @@ def rearrange_pieceList(pieceList, fromList, toList):
             pieceList[end] = getPawn # move correct WP
             pieceList[start] = None  # WP has left this square
             if end == 6 or end == 7  or end == 8:
-                print("241 white wins reaches third row")
+                print("253 white wins reaches third row")
                 W_wins += 1
-                print(f"243 W_wins  {W_wins}")
-                sys.exit(0)
+                print(f"255 W_wins  {W_wins}")
+                gameOver = True
             RD1.redDotflag2 = False # disable click immediately!!
             moveNum += 1 # wait for white move to finish before black move
             
@@ -257,7 +272,7 @@ def rearrange_pieceList(pieceList, fromList, toList):
                     print("256 white wins reaches third row")
                     W_wins += 1
                     print(f"258 W_wins  {W_wins}")
-                    sys.exit(0)
+                    gameOver = True
                 RD.redDotflag2 = False # disable click immediately!!
                 moveNum += 1 # wait for white move to finish before black move
     return pieceList
@@ -301,11 +316,12 @@ def moveBP(pieceList, fromList, toList):
     # time.sleep(5)
     global B_wins
     global W_wins
+    global gameOver
     if len(fromList) == 0:
         print("302 black blocked, white wins")
         W_wins +=1
         print (f"304 W_wins {W_wins}")
-        sys.exit(0)
+        gameOver = True
     # move random possible black pawn    
     r = random.randint(0, len(fromList)-1)
     BP_fromSq = fromList[r]
@@ -324,7 +340,7 @@ def moveBP(pieceList, fromList, toList):
             print("all white pawns captured, black wins")
             B_wins +=1
             print(f"323 B_wins {B_wins}")
-            sys.exit(0)
+            gameOver = True
        
     pieceList[BP_toMoveSq] = BP   # rearrange pieceList
     pieceList[BP_fromSq]  = None
@@ -333,7 +349,7 @@ def moveBP(pieceList, fromList, toList):
         print ("black reaches row 1 wins")
         B_wins += 1
         print(f"390 B_wins {B_wins}")
-        sys.exit(0)
+        gameOver = True
     return (pieceList)
 
 mainWhileCounter = 0   
