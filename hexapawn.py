@@ -66,12 +66,16 @@ class Score:
         self.score_text = self.font.render(f"{self.colour} = {self.wins}",True, (0,0,0))
         self.screen.blit(self.score_text, self.pos)
         
-global W_wins
-global B_wins
-W_wins = 0
-B_wins = 0        
+#global W_wins
+#global B_wins
+B_wins = 0
+W_wins = 0  # these variable values must precede the instance
+
 BScore = Score('Black', B_wins, (630, 20))   
 WScore  = Score('White', W_wins, (630, 320) )
+print(f"76 B_wins {B_wins}")
+print(f"77 BScore.B_wins {BScore.wins}")
+        
     
 # make 3 instances of the WP
 WP1=Pawn() 
@@ -98,8 +102,8 @@ moveNum = 1
 mainCounter = 0
 clickWP = False
 mytuple =([7],[8])  # arbitrary starting values
-W_wins = 0
-B_wins = 0
+#W_wins = 0
+#B_wins = 0
 gameOver = False
 gameNum = 0
 whiteMove = True
@@ -158,8 +162,8 @@ def WPmove():
     blockChecker = True
     if blockChecker == True:
         if blockCheck() == []:
-            B_wins += 1
-            print(f"133 white blocked so B_wins {B_wins}")
+            BScore.wins += 1
+            print(f"162 white blocked so B_wins {B_wins}")
             gameOver = True 
             blockChecker = False
             
@@ -294,7 +298,7 @@ def rearrange_pieceList(pieceList, fromList, toList):
             if end == 6 or end == 7  or end == 8:
                 print("265 white wins reaches third row")
                 print("WP disappears! rearrange revisited!")
-                W_wins += 1
+                WScore.wins += 1
                 print(f"269 W_wins  {W_wins}")
                 gameOver = True
                 BP.BPmove = False
@@ -366,7 +370,7 @@ def moveBP(pieceList, fromList, toList):
     global gameOver
     if len(fromList) == 0:
         print("348 black blocked, white wins")
-        W_wins +=1
+        WScore.wins +=1
         print (f"350 W_wins {W_wins}")
         gameOver = True
         if gameOver:
@@ -388,7 +392,7 @@ def moveBP(pieceList, fromList, toList):
         elif pieceList[9] != None and pieceList[10] != None:
             pieceList[11] = getWP
             print("362 all white pawns captured, black wins")
-            B_wins +=1
+            BScore.wins +=1
             print(f"364 B_wins {B_wins}")
             gameOver = True
        
@@ -397,7 +401,7 @@ def moveBP(pieceList, fromList, toList):
     
     if BP_toMoveSq == 0 or BP_toMoveSq == 1 or BP_toMoveSq == 2:
         print ("black reaches row 1 wins")
-        B_wins += 1
+        BScore.wins += 1
         print(f"390 B_wins {B_wins}")
         gameOver = True
     return (pieceList)
