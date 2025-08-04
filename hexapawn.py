@@ -22,11 +22,6 @@ def grid(bgcolour):
     pygame.draw.line(screen,"black",start_pos=(0,150),end_pos=(750,150))
     pygame.draw.line(screen,"black",start_pos=(0,300),end_pos=(750,300))
 
-def score():
-    font = pygame.font.Font(None, 36)
-    score_text = font.render(f"Black = {B_wins}",True, (0,0,0))
-    screen.blit(score_text, (630, 20))
-
 class Pawn:
     """make a class since want 3 white pawn instances"""
     def __init__(self):
@@ -57,6 +52,26 @@ class RedDot:
     
     def pos(self, boardDict, num ): # to reposition red dots
         return boardDict[num]
+
+class Score:
+    ''' need white and black scores '''
+    def __init__(self, colour, wins, pos):
+        self.screen = screen # give scores access to hexapawn screen
+        self.wins = wins
+        self.colour = colour
+        self.pos = pos
+        
+    def show_score(self):
+        self.font = pygame.font.Font(None, 36) #
+        self.score_text = self.font.render(f"{self.colour} = {self.wins}",True, (0,0,0))
+        self.screen.blit(self.score_text, self.pos)
+        
+global W_wins
+global B_wins
+W_wins = 0
+B_wins = 0        
+BScore = Score('Black', B_wins, (630, 20))   
+WScore  = Score('White', W_wins, (630, 320) )
     
 # make 3 instances of the WP
 WP1=Pawn() 
@@ -390,6 +405,8 @@ def moveBP(pieceList, fromList, toList):
 mainWhileCounter = 0   
                    
 while True:
+    #global B_wins
+    #global W_wins
     mainWhileCounter = mainWhileCounter + 1 
     #print ( f"279 mainWhileCounter = {mainWhileCounter}")  
     for event in pygame.event.get():
@@ -415,7 +432,8 @@ while True:
 
     grid(settings.bg_colour)
     main() # show pieces and run the game
-    score()
+    BScore.show_score() 
+    WScore.show_score()
        
     pygame.display.flip()   # updates entire display
     clock.tick(1)   # speed up clock later
