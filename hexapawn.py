@@ -9,6 +9,7 @@ pygame.init()   # initialise pygame modules
 screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
 #create screen surface
 pygame.display.set_caption('Hexapawn')
+pygame.font.init()  # for displaying scores
 clock = pygame.time.Clock() # create a clock
 
 def grid(bgcolour):
@@ -18,9 +19,13 @@ def grid(bgcolour):
     pygame.draw.line(screen,"black",start_pos=(300,0),end_pos=(300,450))
     pygame.draw.line(screen,"black",start_pos=(450,0),end_pos=(450,450))
     pygame.draw.line(screen,"black",start_pos=(600,0),end_pos=(600,450), width = 5)
-    
     pygame.draw.line(screen,"black",start_pos=(0,150),end_pos=(750,150))
     pygame.draw.line(screen,"black",start_pos=(0,300),end_pos=(750,300))
+
+def score():
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Black = {B_wins}",True, (0,0,0))
+    screen.blit(score_text, (630, 20))
 
 class Pawn:
     """make a class since want 3 white pawn instances"""
@@ -81,22 +86,35 @@ mytuple =([7],[8])  # arbitrary starting values
 W_wins = 0
 B_wins = 0
 gameOver = False
+gameNum = 0
+whiteMove = True
+newGame = False
 
 # main is in the while loop!
 def main(): 
+    piecesShow(pieceList)
     global mainCounter
+    global whiteMove
+    global newGame
     print (f"88 mainCounter gameOver check {mainCounter}")
     print(f"89 gameOver {gameOver}")
+    whiteMove = True    # if not in main() then can't move WP
+    print(f"92 whiteMove {whiteMove}")
     if gameOver == True:
-        sys.exit(0)
-    whiteMove = True
+        #sys.exit(0)
+        whiteMove = False # stop scores cycling
+        try:
+            newGame = input ("Do you want a new game?: Y / N") # want a popup here!
+        except EOFError:
+            newGame ="Y"
+        print("\nYES")
     while whiteMove:
         piecesShow(pieceList)
         global moveNum
         if moveNum % 2 == 1: # odd number 1, 3 etc
             WPmove()
             
-        whiteMove = False
+        whiteMove = False   # without this screen goes black. Why?
         # moveNum incremented in pieces_rearrange
         # otherwise black move happens before white move completed
         if moveNum % 2 == 0:    # even number 2, 4 etc
@@ -106,7 +124,9 @@ def main():
             if mainCounter > 3:
                 BPmove()
                 if gameOver:   # necessary?
-                    sys.exit(0)
+                    pass
+                    #sys.exit(0)
+                whiteMove = True
                 mainCounter = 0
             
     
@@ -124,7 +144,7 @@ def WPmove():
     if blockChecker == True:
         if blockCheck() == []:
             B_wins += 1
-            print(f"117 white blocked so B_wins {B_wins}")
+            print(f"133 white blocked so B_wins {B_wins}")
             gameOver = True 
             blockChecker = False
             
@@ -247,6 +267,7 @@ def rearrange_pieceList(pieceList, fromList, toList):
     global W_wins  
     global moveNum
     global  gameOver
+    global whiteMove
     # Make WP move (rearrange pieceList) when RD clicked then deactivate flags
     if len(toList) == 1: # only one move possible
         if RD1.redDotflag2 == True: # True when RD1 clicked
@@ -256,10 +277,13 @@ def rearrange_pieceList(pieceList, fromList, toList):
             pieceList[end] = getPawn # move correct WP
             pieceList[start] = None  # WP has left this square
             if end == 6 or end == 7  or end == 8:
-                print("253 white wins reaches third row")
+                print("265 white wins reaches third row")
+                print("WP disappears! rearrange revisited!")
                 W_wins += 1
-                print(f"255 W_wins  {W_wins}")
+                print(f"269 W_wins  {W_wins}")
                 gameOver = True
+                BP.BPmove = False
+                return "273 white reaches 3rd row"
             RD1.redDotflag2 = False # disable click immediately!!
             moveNum += 1 # wait for white move to finish before black move
             # make all WPs white
@@ -274,9 +298,9 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 pieceList[end] = getPawn # move correct WP
                 pieceList[start]=None  # WP has left this square
                 if end == 6 or end == 7  or end == 8:
-                    print("256 white wins reaches third row")
+                    print("285 white wins reaches third row")
                     W_wins += 1
-                    print(f"258 W_wins  {W_wins}")
+                    print(f"287 W_wins  {W_wins}")
                     gameOver = True
                 RD.redDotflag2 = False # disable click immediately!!
                 moveNum += 1 # wait for white move to finish before black move
@@ -326,12 +350,13 @@ def moveBP(pieceList, fromList, toList):
     global W_wins
     global gameOver
     if len(fromList) == 0:
-        print("322 black blocked, white wins")
+        print("348 black blocked, white wins")
         W_wins +=1
-        print (f"324 W_wins {W_wins}")
+        print (f"350 W_wins {W_wins}")
         gameOver = True
         if gameOver:
-            sys.exit(0)
+            return "black blocked, white wins"
+            #sys.exit(0)
     # move random possible black pawn    
     r = random.randint(0, len(fromList)-1)
     BP_fromSq = fromList[r]
@@ -347,9 +372,9 @@ def moveBP(pieceList, fromList, toList):
             pieceList[10] = getWP
         elif pieceList[9] != None and pieceList[10] != None:
             pieceList[11] = getWP
-            print("all white pawns captured, black wins")
+            print("362 all white pawns captured, black wins")
             B_wins +=1
-            print(f"323 B_wins {B_wins}")
+            print(f"364 B_wins {B_wins}")
             gameOver = True
        
     pieceList[BP_toMoveSq] = BP   # rearrange pieceList
@@ -390,6 +415,7 @@ while True:
 
     grid(settings.bg_colour)
     main() # show pieces and run the game
+    score()
        
     pygame.display.flip()   # updates entire display
     clock.tick(1)   # speed up clock later
