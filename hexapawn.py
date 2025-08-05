@@ -6,8 +6,8 @@ import random
 import time
 
 pygame.init()   # initialise pygame modules
-screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
 #create screen surface
+screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))   
 pygame.display.set_caption('Hexapawn')
 pygame.font.init()  # for displaying scores
 clock = pygame.time.Clock() # create a clock
@@ -24,7 +24,7 @@ def grid(bgcolour):
 
 class Pawn:
     """make a class since want 3 white pawn instances"""
-    def __init__(self):
+    def __init__(self): # no parameters? poor OOPs?
         self.screen = screen    # give pawns access to hexapawn screen
         self.screenRect = self.screen.get_rect() # for positioning pawns later
         self.WPimg = pygame.image.load('images/whitePawn.png') #image surface!
@@ -39,6 +39,7 @@ class Pawn:
 #    pawn pos method: input boardDict, num -> return board position (x, y)
     def pos(self, boardDict, num ):
         return boardDict[num]
+# could have had a showPawn method here? including blit?
     
 class RedDot:
     """ Need 2 red dots sometimes"""
@@ -47,7 +48,7 @@ class RedDot:
         self.redDotImg = pygame.image.load('images/redDot.png')
         #self.RDtransparent = pygame.image.load('images/redDotTransparent.png')
         self.redDotRect = self.redDotImg.get_rect()
-        #self.concealFlag = False    # for concealing red dots (abandoned)
+        #self.concealFlag = False    # for concealing red dots (abandoned?)
         self.redDotflag2 = False    # for red dot clicking
     
     def pos(self, boardDict, num ): # to reposition red dots
@@ -57,25 +58,18 @@ class Score:
     ''' need white and black scores '''
     def __init__(self, colour, wins, pos):
         self.screen = screen # give scores access to hexapawn screen
-        self.wins = wins
+        self.wins = wins    # parameters always require attributes?
         self.colour = colour
         self.pos = pos
         
     def show_score(self):
-        self.font = pygame.font.Font(None, 36) #
+        self.font = pygame.font.Font(None, 36) # builtin default font, freesansbold
+        # render (text, antialias, color)
         self.score_text = self.font.render(f"{self.colour} = {self.wins}",True, (0,0,0))
-        self.screen.blit(self.score_text, self.pos)
+        self.screen.blit(self.score_text, self.pos) # blit (source, destination)
         
-#global W_wins
-#global B_wins
-B_wins = 0
-W_wins = 0  # these variable values must precede the instance
-
-BScore = Score('Black', B_wins, (630, 20))   
-WScore  = Score('White', W_wins, (630, 320) )
-print(f"76 B_wins {B_wins}")
-print(f"77 BScore.B_wins {BScore.wins}")
-        
+BScore = Score('Black', 0, (630, 20))   # win = 0 initially, then BScore.wins
+WScore  = Score('White', 0, (630, 320) )
     
 # make 3 instances of the WP
 WP1=Pawn() 
@@ -102,8 +96,6 @@ moveNum = 1
 mainCounter = 0
 clickWP = False
 mytuple =([7],[8])  # arbitrary starting values
-#W_wins = 0
-#B_wins = 0
 gameOver = False
 gameNum = 0
 whiteMove = True
@@ -115,10 +107,11 @@ def main():
     global mainCounter
     global whiteMove
     global newGame
-    print (f"88 mainCounter gameOver check {mainCounter}")
-    print(f"89 gameOver {gameOver}")
-    whiteMove = True    # if not in main() then can't move WP
-    print(f"92 whiteMove {whiteMove}")
+    print (f"110 mainCounter gameOver check {mainCounter}")
+    print(f"111 gameOver {gameOver}")
+    if gameOver == False:
+        whiteMove = True    # if not in main() then can't move WP
+    print(f"114 whiteMove {whiteMove}")
     if gameOver == True:
         #sys.exit(0)
         whiteMove = False # stop scores cycling
@@ -127,6 +120,11 @@ def main():
         except EOFError:
             newGame ="Y"
         print("\nYES")
+        pieceList_new = [WP1,WP2,WP3, None, None, None, BP, BP, BP, None, None, None ]
+        # pieceList = pieceList_new[:]
+        # unbound local error even though I make a copy. WHY?
+        #UnboundLocalError: cannot access local variable 'pieceList' where it is not associated with a value
+        # referring to line 106
     while whiteMove:
         piecesShow(pieceList)
         global moveNum
@@ -142,33 +140,31 @@ def main():
             mainCounter += 1
             if mainCounter > 3:
                 BPmove()
-                if gameOver:   # necessary?
-                    pass
+                if gameOver:   # necessary
+                    return  # avoid another white move when black blocked
                     #sys.exit(0)
                 whiteMove = True
                 mainCounter = 0
             
     
 def WPmove():       
-    print(f"111 WPmove moveNum {moveNum}")
+    print(f"145 WPmove moveNum {moveNum}")
     piecesShow(pieceList) 
     global clickWP
     global mytuple
     global blockChecker
-    global W_wins
-    global B_wins
     global gameOver
     
     blockChecker = True
     if blockChecker == True:
         if blockCheck() == []:
-            BScore.wins += 1
-            print(f"162 white blocked so B_wins {B_wins}")
+            BScore.wins += 1    # How to increment the score!
+            print(f"162 white blocked so BScore.wins {BScore.wins}")
             gameOver = True 
             blockChecker = False
             
     if clickWP == True:
-        # if RD on same square as WP then deactivate RDflag2 for now
+        # if RD on same square as WP then deactivate RDflag2
         for RD in RDList:
             if RD.redDotflag2 == True:
                 RD.redDotflag2 = False
@@ -283,7 +279,6 @@ def redDots(fromList, toList):
             screen.blit(RD.redDotImg,(RD.redDotRect))
                 
 def rearrange_pieceList(pieceList, fromList, toList):     
-    global W_wins  
     global moveNum
     global  gameOver
     global whiteMove
@@ -296,12 +291,15 @@ def rearrange_pieceList(pieceList, fromList, toList):
             pieceList[end] = getPawn # move correct WP
             pieceList[start] = None  # WP has left this square
             if end == 6 or end == 7  or end == 8:
-                print("265 white wins reaches third row")
+                print("291 white wins reaches third row")
                 print("WP disappears! rearrange revisited!")
                 WScore.wins += 1
-                print(f"269 W_wins  {W_wins}")
+                print(f"2294 WScore.wins  {WScore.wins}")
                 gameOver = True
                 BP.BPmove = False
+                # make all WPs white
+                for WP in WPList:
+                    WP.WPflag2 = False
                 return "273 white reaches 3rd row"
             RD1.redDotflag2 = False # disable click immediately!!
             moveNum += 1 # wait for white move to finish before black move
@@ -318,15 +316,15 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 pieceList[start]=None  # WP has left this square
                 if end == 6 or end == 7  or end == 8:
                     print("285 white wins reaches third row")
-                    W_wins += 1
-                    print(f"287 W_wins  {W_wins}")
+                    WScore.wins += 1
+                    print(f"287 WScore.wins  {WScore.wins}")
                     gameOver = True
                 RD.redDotflag2 = False # disable click immediately!!
                 moveNum += 1 # wait for white move to finish before black move
-                # make all WPs white
+            # make all WPs white
                 for WP in WPList:
                     WP.WPflag2 = False
-                return pieceList
+                #return pieceList # unnecessary, why?
 
 # make BP to & from lists    
 def to_from_BP():
@@ -365,13 +363,11 @@ def to_from_BP():
 # FL & TL here needed for unpacking of tuple
 def moveBP(pieceList, fromList, toList):
     # time.sleep(5)
-    global B_wins
-    global W_wins
     global gameOver
     if len(fromList) == 0:
-        print("348 black blocked, white wins")
+        print("372 black blocked, white wins")
         WScore.wins +=1
-        print (f"350 W_wins {W_wins}")
+        print (f"374 WScore.wins {WScore.wins}")
         gameOver = True
         if gameOver:
             return "black blocked, white wins"
@@ -391,26 +387,24 @@ def moveBP(pieceList, fromList, toList):
             pieceList[10] = getWP
         elif pieceList[9] != None and pieceList[10] != None:
             pieceList[11] = getWP
-            print("362 all white pawns captured, black wins")
+            print("384 all white pawns captured, black wins")
             BScore.wins +=1
-            print(f"364 B_wins {B_wins}")
+            print(f"386 BScore.wins {BScore.wins}")
             gameOver = True
        
     pieceList[BP_toMoveSq] = BP   # rearrange pieceList
     pieceList[BP_fromSq]  = None
     
     if BP_toMoveSq == 0 or BP_toMoveSq == 1 or BP_toMoveSq == 2:
-        print ("black reaches row 1 wins")
+        print ("403 black reaches row 1 wins")
         BScore.wins += 1
-        print(f"390 B_wins {B_wins}")
+        print(f"405 BScore.wins {BScore.wins}")
         gameOver = True
     return (pieceList)
 
 mainWhileCounter = 0   
                    
 while True:
-    #global B_wins
-    #global W_wins
     mainWhileCounter = mainWhileCounter + 1 
     #print ( f"279 mainWhileCounter = {mainWhileCounter}")  
     for event in pygame.event.get():
@@ -436,6 +430,7 @@ while True:
 
     grid(settings.bg_colour)
     main() # show pieces and run the game
+    # show the scores
     BScore.show_score() 
     WScore.show_score()
        
