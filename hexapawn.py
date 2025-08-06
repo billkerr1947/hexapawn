@@ -58,7 +58,7 @@ class Score:
     ''' need white and black scores '''
     def __init__(self, colour, wins, pos):
         self.screen = screen # give scores access to hexapawn screen
-        self.wins = wins    # parameters always require attributes?
+        self.wins = wins    # parameters always require attributes (yes?)
         self.colour = colour
         self.pos = pos
         
@@ -103,15 +103,19 @@ newGame = False
 
 # main is in the while loop!
 def main(): 
+    global pieceList
     piecesShow(pieceList)
     global mainCounter
     global whiteMove
     global newGame
-    print (f"110 mainCounter gameOver check {mainCounter}")
-    print(f"111 gameOver {gameOver}")
+    global moveNum
+    global gameOver
+    #print (f"110 mainCounter gameOver check {mainCounter}")
+    #print(f"111 gameOver {gameOver}")
     if gameOver == False:
         whiteMove = True    # if not in main() then can't move WP
-    print(f"114 whiteMove {whiteMove}")
+    print(f"117 gameOver {gameOver}")
+    print(f"118 whiteMove {whiteMove}")
     if gameOver == True:
         #sys.exit(0)
         whiteMove = False # stop scores cycling
@@ -120,14 +124,24 @@ def main():
         except EOFError:
             newGame ="Y"
         print("\nYES")
+        # start a new game
         pieceList_new = [WP1,WP2,WP3, None, None, None, BP, BP, BP, None, None, None ]
-        # pieceList = pieceList_new[:]
+        pieceList = pieceList_new[:]
+        # pause before new game
+        mainCounter = 0
+        mainCounter += 1
+        print(f"132 mainCounter newGame {mainCounter}")
+        if mainCounter > 6:
+            whiteMove = True
+        gameOver = False
+        global moveNum
+        moveNum = 1
         # unbound local error even though I make a copy. WHY?
         #UnboundLocalError: cannot access local variable 'pieceList' where it is not associated with a value
         # referring to line 106
     while whiteMove:
         piecesShow(pieceList)
-        global moveNum
+        #global moveNum
         if moveNum % 2 == 1: # odd number 1, 3 etc
             WPmove()
             
@@ -182,7 +196,7 @@ def WPmove():
         redDots(*mytuple) # red dots appear
         
         rearrange_pieceList(pieceList, *mytuple ) 
-        #print("136 pieces rearranged done")
+        #print("191 pieces rearranged done")
     
         piecesShow(pieceList)
     BP.BPflag = True
@@ -291,16 +305,18 @@ def rearrange_pieceList(pieceList, fromList, toList):
             pieceList[end] = getPawn # move correct WP
             pieceList[start] = None  # WP has left this square
             if end == 6 or end == 7  or end == 8:
-                print("291 white wins reaches third row")
+                print("308 white wins reaches third row")
                 print("WP disappears! rearrange revisited!")
                 WScore.wins += 1
-                print(f"2294 WScore.wins  {WScore.wins}")
+                print(f"311 WScore.wins  {WScore.wins}")
                 gameOver = True
                 BP.BPmove = False
                 # make all WPs white
                 for WP in WPList:
                     WP.WPflag2 = False
-                return "273 white reaches 3rd row"
+                RD1.redDotflag2 = False # disable click immediately!!
+                #WPmove = False # disable captures?
+                return "317 white reaches 3rd row"
             RD1.redDotflag2 = False # disable click immediately!!
             moveNum += 1 # wait for white move to finish before black move
             # make all WPs white
