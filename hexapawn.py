@@ -46,9 +46,9 @@ class RedDot:
     def __init__(self):
         self.screen = screen    # give red dots access to hexapawn screen
         self.redDotImg = pygame.image.load('images/redDot.png')
-        #self.RDtransparent = pygame.image.load('images/redDotTransparent.png')
+        self.RDConceal = pygame.image.load('images/redDotConceal.png')
         self.redDotRect = self.redDotImg.get_rect()
-        #self.concealFlag = False    # for concealing red dots (abandoned?)
+        self.concealFlag = False    # for concealing red dots
         self.redDotflag2 = False    # for red dot clicking
     
     def pos(self, boardDict, num ): # to reposition red dots
@@ -127,6 +127,9 @@ def main():
         # start a new game
         pieceList_new = [WP1,WP2,WP3, None, None, None, BP, BP, BP, None, None, None ]
         pieceList = pieceList_new[:]
+        # hide red dots
+        for RD in RDList:
+            RD.concealFlag = True
         # pause before new game
         mainCounter = 0
         mainCounter += 1
@@ -136,9 +139,6 @@ def main():
         gameOver = False
         global moveNum
         moveNum = 1
-        # unbound local error even though I make a copy. WHY?
-        #UnboundLocalError: cannot access local variable 'pieceList' where it is not associated with a value
-        # referring to line 106
     while whiteMove:
         piecesShow(pieceList)
         #global moveNum
@@ -286,11 +286,17 @@ def redDots(fromList, toList):
     # show clickable red dots on screen in correct positions using to lists
     if len(toList) == 1:
         RD1.redDotRect.topleft = (RD1.pos(boardDict, toList[0]))
-        screen.blit(RD1.redDotImg,(RD1.redDotRect))
+        if RD1.concealFlag == False:
+            screen.blit(RD1.redDotImg,(RD1.redDotRect))
+        elif RD1.concealFlag == True:
+            screen.blit(RD1.RDConceal,(RD1.redDotRect))
     elif len(toList)==2:
         for num, RD in enumerate(RDList):   # loop through RD1, RD2
             RD.redDotRect.topleft = (RD.pos(boardDict, toList[num]))
-            screen.blit(RD.redDotImg,(RD.redDotRect))
+            if RD.concealFlag == False:
+                screen.blit(RD.redDotImg,(RD.redDotRect))
+            elif RD.concealFlag == True:
+                screen.blit(RD1.RDConceal,(RD1.redDotRect))
                 
 def rearrange_pieceList(pieceList, fromList, toList):     
     global moveNum
@@ -315,13 +321,15 @@ def rearrange_pieceList(pieceList, fromList, toList):
                 for WP in WPList:
                     WP.WPflag2 = False
                 RD1.redDotflag2 = False # disable click immediately!!
-                #WPmove = False # disable captures?
+                RD1.concealFlag = True
+                
                 return "317 white reaches 3rd row"
             RD1.redDotflag2 = False # disable click immediately!!
             moveNum += 1 # wait for white move to finish before black move
             # make all WPs white
             for WP in WPList:
                 WP.WPflag2 = False
+            RD1.concealFlag = True
     elif len(toList) == 2:
         for num, RD in enumerate(RDList):
             if RD.redDotflag2 == True:
@@ -340,6 +348,8 @@ def rearrange_pieceList(pieceList, fromList, toList):
             # make all WPs white
                 for WP in WPList:
                     WP.WPflag2 = False
+                for RD in RDList:
+                    RD.concealFlag = True
                 #return pieceList # unnecessary, why?
 
 # make BP to & from lists    
@@ -436,6 +446,8 @@ while True:
                     WP.WPflag1 = True # flag for clicked WP to from lists
                     WP.WPflag2 = True # flag for clicked WP colour red
                     clickWP = True
+                    for RD in RDList:
+                        RD.concealFlag = False
                     
             # for flag 2 activate RD1 or 2 when clicked
             for RD in RDList:
